@@ -1,7 +1,7 @@
 grammar Espresso;
 
-//options { tokenVocab=CommonLexer; }
-import CommonLexer;
+options { tokenVocab=EspressoLexer; }
+//import EspressoLexer;
 
 @header {
 package espresso;

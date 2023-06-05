@@ -50,7 +50,7 @@
         <maven.test.plugins.version>3.0.0-M6</maven.test.plugins.version>
 
         <lombok.version>1.18.24</lombok.version>
-        <junit.version>5.8.2</junit.version>
+        <junit.version>5.9.0</junit.version>
         <mockito.version>4.4.0</mockito.version>
         <log4j2.version>2.17.1</log4j2.version>
         <resilience4j.version>1.7.1</resilience4j.version>
@@ -65,6 +65,11 @@
         <jcommander.version>1.82</jcommander.version>
         <guava.version>31.1-jre</guava.version>
         <gson.version>2.9.0</gson.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
+        <antlr.version>4.13.0</antlr.version>
     </properties>
 
     <dependencies>
@@ -186,18 +191,50 @@
             <version>4.13.0</version>
         </dependency>
     </dependencies>
-
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <artifactId>maven-surefire-plugin</artifactId>-->
-<!--                <version>${maven.test.plugins.version}</version>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <artifactId>maven-failsafe-plugin</artifactId>-->
-<!--                <version>${maven.test.plugins.version}</version>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
-
+    <build>
+        <sourceDirectory>src/main/java/org/csfundamental/syntax</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${antlr.version}</version>
+                <configuration>
+                    <sourceDirectory>src/resources</sourceDirectory>
+                    <includes>
+                        <include>EspressoLexer.g4</include>
+                        <include>Espresso.g4</include>
+                    </includes>
+                    <visitor>true</visitor>
+                    <listener>true</listener>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.khubla.antlr</groupId>
+                <artifactId>antlr4test-maven-plugin</artifactId>
+                <version>${antlr4test-maven-plugin.version}</version>
+                <configuration>
+                    <verbose>false</verbose>
+                    <showTree>false</showTree>
+                    <entryPoint>compilationUnit</entryPoint>
+                    <grammarName>Java</grammarName>
+                    <packageName></packageName>
+                    <exampleFiles>examples/</exampleFiles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
