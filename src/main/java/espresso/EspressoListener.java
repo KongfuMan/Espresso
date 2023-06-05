@@ -1,5 +1,6 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
-package org.csfundamental.syntax;
+
+package espresso;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

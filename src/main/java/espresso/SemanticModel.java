@@ -1,4 +1,4 @@
-package org.csfundamental.syntax;
+package espresso;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 

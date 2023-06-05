@@ -1,5 +1,6 @@
-package org.csfundamental.syntax;
+package espresso;
 
+import espresso.SemanticModel;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -9,7 +10,7 @@ public class EspressoCompiler {
     EspressoLexer lexer = null;
     EspressoParser parser = null;
 
-    public SemanticModel compile(String script, boolean verbose, boolean ast_dump) {
+    public SemanticModel compile(String script) {
         semantModel = new SemanticModel();
 
         //Lexical analysis
@@ -33,7 +34,13 @@ public class EspressoCompiler {
         //semantic analysis- pass5: ??
 
         //semantic analysis- pass6：closure analysis
-
+        dumpAST();
         return semantModel;
+    }
+
+    public void dumpAST(){
+        if (semantModel!=null) {
+            System.out.println(semantModel.syntaxTree.toStringTree(parser));
+        }
     }
 }

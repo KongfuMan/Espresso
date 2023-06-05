@@ -188,20 +188,20 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.13.0</version>
+            <version>4.12.0</version>
         </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>src/main/java/org/csfundamental/syntax</sourceDirectory>
+        <sourceDirectory>src/main/java/</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
                 <configuration>
-                    <sourceDirectory>src/resources</sourceDirectory>
+                    <sourceDirectory>src/main/java/</sourceDirectory>
                     <includes>
-                        <include>EspressoLexer.g4</include>
+                        <include>CommonLexer.g4</include>
                         <include>Espresso.g4</include>
                     </includes>
                     <visitor>true</visitor>
@@ -224,8 +224,7 @@
                     <showTree>false</showTree>
                     <entryPoint>compilationUnit</entryPoint>
                     <grammarName>Java</grammarName>
-                    <packageName></packageName>
-                    <exampleFiles>examples/</exampleFiles>
+                    <packageName>espresso</packageName>
                 </configuration>
                 <executions>
                     <execution>

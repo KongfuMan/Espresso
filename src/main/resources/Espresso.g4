@@ -1,7 +1,7 @@
 grammar Espresso;
 
-options { tokenVocab=EspressoLexer; }
-//import EspressoLexer;
+//options { tokenVocab=EspressoLexer; }
+import CommonLexer;
 
 @header {
 package espresso;
@@ -12,9 +12,7 @@ compilationUnit
 	;
 
 classDeclaration
-    : CLASS IDENTIFIER
-      (EXTENDS typeType)?
-      classBody
+    : CLASS IDENTIFIER (EXTENDS typeType)? classBody
     ;
 
 classBody

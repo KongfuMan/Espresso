@@ -1,4 +1,4 @@
-lexer grammar EspressoLexer;
+lexer grammar CommonLexer;
 
 // Keywords
 
