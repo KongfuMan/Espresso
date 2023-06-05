@@ -1,4 +1,4 @@
-package espresso;
+package espresso.syntax;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 

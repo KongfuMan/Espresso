@@ -1,4 +1,4 @@
-import espresso.EspressoCompiler;
+import espresso.syntax.EspressoCompiler;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,7 +17,7 @@ public class Application {
         //String script = "int fun1(int a){return a+1;} println(fun1(2)); function int(int) fun2=fun1; fun2(3);";
         //String script = "int a=0; function int() fun1(){int b=0; int inner(){a=a+1; b=b+1; return b;} return inner;} function int() fun2 = fun1(); println(fun2()); println(fun2());";
         //String script = "println(2+3.5); println(\"Hello \" + 45); ";
-        String scriptFile = "/Users/charles/Documents/projects/Espresso/src/main/java/espresso/MyClass.esp";
+        String scriptFile = "/Users/charles/Documents/projects/Espresso/src/main/java/espresso/syntax/MyClass.esp";
         String script = readTextFile(scriptFile);
         EspressoCompiler compiler = new EspressoCompiler();
         compiler.compile(script);
