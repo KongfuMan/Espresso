@@ -7,7 +7,7 @@ import CommonLexer;
 package espresso;
 }
 
-compilationUnit
+compilationUnit // root node includes one or more class declaration
 	: classDeclaration* EOF
 	;
 
@@ -37,7 +37,7 @@ memberDeclaration
    for invalid return type after parsing.
  */
 methodDeclaration
-    : typeTypeOrVoid IDENTIFIER parameters ('[' ']')*
+    : typeTypeOrVoid IDENTIFIER parameterList ('[' ']')*
       (THROWS qualifiedNameList)?
       methodBody
     ;
@@ -56,7 +56,7 @@ qualifiedNameList
     : qualifiedName (',' qualifiedName)*
     ;
 
-parameters
+parameterList
     : '(' (parameter (',' parameter)*)? ')'
     ;
 
@@ -73,7 +73,7 @@ fieldDeclaration
     ;
 
 constructorDeclaration
-    : IDENTIFIER parameters
+    : IDENTIFIER parameterList
     (THROWS qualifiedNameList)?
     constructorBody=block
     ;
@@ -100,7 +100,7 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    : qualifiedName  // full qualified name segmented by dot.
+    : qualifiedName  // qualified name segmented by dot. Generic type or template is not supported for simplicity
     ;
 
 literal
@@ -124,19 +124,6 @@ floatLiteral
     | HEX_FLOAT_LITERAL
     ;
 
-// STATEMENTS / BLOCKS
-//program
-//    : blockStatements
-//    ;
-
-//block
-//    : '{' blockStatements '}'
-//    ;
-
-//blockStatements
-//    : blockStatement*
-//    ;
-
 block
     : '{' blockStatement* '}'
     ;
@@ -149,17 +136,17 @@ blockStatement
 
 statement
     : blockLabel=block
-    | IF parExpression statement (ELSE statement)?
+    | IF '(' expression ')' statement (ELSE statement)?
     | FOR '(' forControl ')' statement
-    | WHILE parExpression statement
-    | DO statement WHILE parExpression ';'
-    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-    | RETURN expression? ';'
-    | BREAK IDENTIFIER? ';'
-    | CONTINUE IDENTIFIER? ';'
+    | WHILE '(' expression ')' statement
+    | DO statement WHILE '(' expression ')' SEMI
+    | SWITCH '(' expression ')' '{' switchBlockStatementGroup* switchLabel* '}'
+    | RETURN expression? SEMI
+    | BREAK IDENTIFIER? SEMI
+    | CONTINUE IDENTIFIER? SEMI
     | SEMI
-    | statementExpression=expression ';'
-    | identifierLabel=IDENTIFIER ':' statement
+    | statementExpression=expression SEMI
+    | identifierLabel=IDENTIFIER COLON statement
     ;
 
 /** Matches cases then statements, both of which are mandatory.
@@ -170,8 +157,8 @@ switchBlockStatementGroup
     ;
 
 switchLabel
-    : CASE (constantExpression=expression | enumConstantName=IDENTIFIER) ':'
-    | DEFAULT ':'
+    : CASE (constantExpression=expression | enumConstantName=IDENTIFIER) COLON
+    | DEFAULT COLON
     ;
 
 forControl
@@ -188,17 +175,11 @@ enhancedForControl
     : typeType variableDeclaratorId ':' expression
     ;
 
-// EXPRESSIONS
-
-parExpression
-    : '(' expression ')'
-    ;
-
 expressionList
     : expression (',' expression)*
     ;
 
-functionCall
+methodCall
     : IDENTIFIER '(' expressionList? ')'
     | THIS '(' expressionList? ')'
     | SUPER '(' expressionList? ')'
@@ -208,11 +189,11 @@ expression
     : primary
     | expression bop='.'
       ( IDENTIFIER
-      | functionCall
+      | methodCall
       | THIS
       )
     | expression '[' expression ']'
-    | functionCall
+    | methodCall
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -233,7 +214,6 @@ expression
       expression
     ;
 
-
 primary
     : '(' expression ')'
     | THIS
@@ -242,16 +222,8 @@ primary
     | IDENTIFIER
     ;
 
-typeList
-    : typeType (',' typeType)*
-    ;
-
 typeType
-    : (classOrInterfaceType| functionType | primitiveType) ('[' ']')*
-    ;
-
-functionType
-    : FUNCTION typeTypeOrVoid '(' typeList? ')'
+    : (classOrInterfaceType | primitiveType) ('[' ']')*
     ;
 
 primitiveType
@@ -265,16 +237,3 @@ primitiveType
     | DOUBLE
     | STRING
     ;
-
-//creator
-//    : IDENTIFIER arguments
-//    ;
-//
-//superSuffix
-//    : arguments
-//    | '.' IDENTIFIER arguments?
-//    ;
-//
-//arguments
-//    : '(' expressionList? ')'
-//    ;
