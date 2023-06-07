@@ -1,5 +1,4 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
-
 package espresso.syntax;
 
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
@@ -67,11 +66,11 @@ public interface EspressoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitQualifiedNameList(EspressoParser.QualifiedNameListContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link EspressoParser#parameters}.
+	 * Visit a parse tree produced by {@link EspressoParser#parameterList}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParameters(EspressoParser.ParametersContext ctx);
+	T visitParameterList(EspressoParser.ParameterListContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link EspressoParser#parameter}.
 	 * @param ctx the parse tree
@@ -199,23 +198,17 @@ public interface EspressoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEnhancedForControl(EspressoParser.EnhancedForControlContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link EspressoParser#parExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParExpression(EspressoParser.ParExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link EspressoParser#expressionList}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpressionList(EspressoParser.ExpressionListContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link EspressoParser#functionCall}.
+	 * Visit a parse tree produced by {@link EspressoParser#methodCall}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunctionCall(EspressoParser.FunctionCallContext ctx);
+	T visitMethodCall(EspressoParser.MethodCallContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link EspressoParser#expression}.
 	 * @param ctx the parse tree
@@ -229,23 +222,11 @@ public interface EspressoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimary(EspressoParser.PrimaryContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link EspressoParser#typeList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTypeList(EspressoParser.TypeListContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link EspressoParser#typeType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitTypeType(EspressoParser.TypeTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link EspressoParser#functionType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionType(EspressoParser.FunctionTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link EspressoParser#primitiveType}.
 	 * @param ctx the parse tree

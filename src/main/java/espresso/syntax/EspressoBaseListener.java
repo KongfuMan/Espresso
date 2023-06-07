@@ -1,5 +1,4 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
-
 package espresso.syntax;
 
 
@@ -127,13 +126,13 @@ public class EspressoBaseListener implements EspressoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParameters(EspressoParser.ParametersContext ctx) { }
+	@Override public void enterParameterList(EspressoParser.ParameterListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParameters(EspressoParser.ParametersContext ctx) { }
+	@Override public void exitParameterList(EspressoParser.ParameterListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -391,18 +390,6 @@ public class EspressoBaseListener implements EspressoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParExpression(EspressoParser.ParExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitParExpression(EspressoParser.ParExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterExpressionList(EspressoParser.ExpressionListContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -415,13 +402,13 @@ public class EspressoBaseListener implements EspressoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunctionCall(EspressoParser.FunctionCallContext ctx) { }
+	@Override public void enterMethodCall(EspressoParser.MethodCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunctionCall(EspressoParser.FunctionCallContext ctx) { }
+	@Override public void exitMethodCall(EspressoParser.MethodCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -451,18 +438,6 @@ public class EspressoBaseListener implements EspressoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTypeList(EspressoParser.TypeListContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTypeList(EspressoParser.TypeListContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterTypeType(EspressoParser.TypeTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -470,18 +445,6 @@ public class EspressoBaseListener implements EspressoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTypeType(EspressoParser.TypeTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterFunctionType(EspressoParser.FunctionTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFunctionType(EspressoParser.FunctionTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

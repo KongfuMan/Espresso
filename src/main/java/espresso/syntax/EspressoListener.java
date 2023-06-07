@@ -1,5 +1,4 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
-
 package espresso.syntax;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -100,15 +99,15 @@ public interface EspressoListener extends ParseTreeListener {
 	 */
 	void exitQualifiedNameList(EspressoParser.QualifiedNameListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link EspressoParser#parameters}.
+	 * Enter a parse tree produced by {@link EspressoParser#parameterList}.
 	 * @param ctx the parse tree
 	 */
-	void enterParameters(EspressoParser.ParametersContext ctx);
+	void enterParameterList(EspressoParser.ParameterListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link EspressoParser#parameters}.
+	 * Exit a parse tree produced by {@link EspressoParser#parameterList}.
 	 * @param ctx the parse tree
 	 */
-	void exitParameters(EspressoParser.ParametersContext ctx);
+	void exitParameterList(EspressoParser.ParameterListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link EspressoParser#parameter}.
 	 * @param ctx the parse tree
@@ -320,16 +319,6 @@ public interface EspressoListener extends ParseTreeListener {
 	 */
 	void exitEnhancedForControl(EspressoParser.EnhancedForControlContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link EspressoParser#parExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterParExpression(EspressoParser.ParExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link EspressoParser#parExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitParExpression(EspressoParser.ParExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link EspressoParser#expressionList}.
 	 * @param ctx the parse tree
 	 */
@@ -340,15 +329,15 @@ public interface EspressoListener extends ParseTreeListener {
 	 */
 	void exitExpressionList(EspressoParser.ExpressionListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link EspressoParser#functionCall}.
+	 * Enter a parse tree produced by {@link EspressoParser#methodCall}.
 	 * @param ctx the parse tree
 	 */
-	void enterFunctionCall(EspressoParser.FunctionCallContext ctx);
+	void enterMethodCall(EspressoParser.MethodCallContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link EspressoParser#functionCall}.
+	 * Exit a parse tree produced by {@link EspressoParser#methodCall}.
 	 * @param ctx the parse tree
 	 */
-	void exitFunctionCall(EspressoParser.FunctionCallContext ctx);
+	void exitMethodCall(EspressoParser.MethodCallContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link EspressoParser#expression}.
 	 * @param ctx the parse tree
@@ -370,16 +359,6 @@ public interface EspressoListener extends ParseTreeListener {
 	 */
 	void exitPrimary(EspressoParser.PrimaryContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link EspressoParser#typeList}.
-	 * @param ctx the parse tree
-	 */
-	void enterTypeList(EspressoParser.TypeListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link EspressoParser#typeList}.
-	 * @param ctx the parse tree
-	 */
-	void exitTypeList(EspressoParser.TypeListContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link EspressoParser#typeType}.
 	 * @param ctx the parse tree
 	 */
@@ -389,16 +368,6 @@ public interface EspressoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTypeType(EspressoParser.TypeTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link EspressoParser#functionType}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunctionType(EspressoParser.FunctionTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link EspressoParser#functionType}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunctionType(EspressoParser.FunctionTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link EspressoParser#primitiveType}.
 	 * @param ctx the parse tree

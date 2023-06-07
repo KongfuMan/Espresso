@@ -1,5 +1,6 @@
 package espresso.syntax;
 
+import espresso.semantics.TypeDeclarationScanner;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -10,19 +11,19 @@ public class EspressoCompiler {
     EspressoParser parser = null;
 
     public SemanticModel compile(String script) {
-        semantModel = new SemanticModel();
-
         //Lexical analysis
         lexer = new EspressoLexer(CharStreams.fromString(script));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         //syntax analysis
         parser = new EspressoParser(tokens);
-        semantModel.syntaxTree = parser.compilationUnit();
+        semantModel = new SemanticModel(parser.compilationUnit());
 
         ParseTreeWalker walker = new ParseTreeWalker();
 
         // semantic analysis- pass1.type declaration
+        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semantModel);
+        walker.walk(pass1, semantModel.getSyntaxTree());
 
         //semantic analysis- pass2：variable declaration
 
@@ -39,7 +40,7 @@ public class EspressoCompiler {
 
     public void dumpAST(){
         if (semantModel!=null) {
-            System.out.println(semantModel.syntaxTree.toStringTree(parser));
+            System.out.println(semantModel.getSyntaxTree().toStringTree(parser));
         }
     }
 }
