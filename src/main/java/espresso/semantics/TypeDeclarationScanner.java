@@ -108,6 +108,14 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     }
 
     @Override
+    public void enterMethodDeclaration(MethodDeclarationContext node) {
+        String idName = node.IDENTIFIER().getText();
+        MethodSymbol methodSymbol = new MethodSymbol(idName, node, currentScope());
+        currentScope().addSymbol(idName, methodSymbol);
+        pushScope(node, methodSymbol);
+    }
+
+    @Override
     public void exitMethodDeclaration(MethodDeclarationContext ctx) {
         popScope();
     }

@@ -2,8 +2,6 @@ package espresso.semantics.symbols;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.awt.*;
-
 public abstract class Symbol {
     protected String idName;
     protected Scope containingScope;
@@ -17,7 +15,7 @@ public abstract class Symbol {
         this.containingScope = containingScope;
     }
 
-    public String getFullName(){
+    public String getName(){
         return idName;
     }
 
