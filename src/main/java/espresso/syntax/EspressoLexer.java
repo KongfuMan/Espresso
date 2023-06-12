@@ -1,4 +1,5 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
+
 package espresso.syntax;
 
 import org.antlr.v4.runtime.Lexer;

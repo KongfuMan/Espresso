@@ -1,6 +1,8 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
+
 package espresso.syntax;
 
+import espresso.syntax.EspressoParser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -138,16 +140,6 @@ public interface EspressoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFieldDeclaration(EspressoParser.FieldDeclarationContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link EspressoParser#constructorDeclaration}.
-	 * @param ctx the parse tree
-	 */
-	void enterConstructorDeclaration(EspressoParser.ConstructorDeclarationContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link EspressoParser#constructorDeclaration}.
-	 * @param ctx the parse tree
-	 */
-	void exitConstructorDeclaration(EspressoParser.ConstructorDeclarationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link EspressoParser#variableDeclarators}.
 	 * @param ctx the parse tree

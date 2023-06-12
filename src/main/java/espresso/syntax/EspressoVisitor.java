@@ -1,6 +1,8 @@
 // Generated from /Users/charles/Documents/projects/Espresso/src/main/resources/Espresso.g4 by ANTLR 4.12.0
+
 package espresso.syntax;
 
+import espresso.syntax.EspressoParser;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -89,12 +91,6 @@ public interface EspressoVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFieldDeclaration(EspressoParser.FieldDeclarationContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link EspressoParser#constructorDeclaration}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConstructorDeclaration(EspressoParser.ConstructorDeclarationContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link EspressoParser#variableDeclarators}.
 	 * @param ctx the parse tree
