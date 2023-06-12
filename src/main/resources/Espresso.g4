@@ -26,7 +26,7 @@ classBodyDeclaration
 
 memberDeclaration
     : fieldDeclaration
-    | constructorDeclaration
+//    | constructorDeclaration
     | methodDeclaration
     | classDeclaration  //nested class declaration
     ;
@@ -72,11 +72,11 @@ fieldDeclaration
     : variableDeclarators ';'
     ;
 
-constructorDeclaration
-    : IDENTIFIER parameterList
-    (THROWS qualifiedNameList)?
-    constructorBody=block
-    ;
+//constructorDeclaration
+//    : IDENTIFIER parameterList
+//    (THROWS qualifiedNameList)?
+//    constructorBody=block
+//    ;
 
 variableDeclarators
     : typeType variableDeclarator (',' variableDeclarator)*

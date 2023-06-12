@@ -1,14 +1,8 @@
 package espresso.semantics;
 
 import espresso.semantics.symbols.*;
-import espresso.syntax.EspressoBaseListener;
-import espresso.syntax.EspressoParser.CompilationUnitContext;
-import espresso.syntax.EspressoParser.ClassDeclarationContext;
-import espresso.syntax.EspressoParser.MethodDeclarationContext;
-import espresso.syntax.EspressoParser.BlockContext;
-import espresso.syntax.EspressoParser.MethodBodyContext;
-import espresso.syntax.EspressoParser.StatementContext;
-import espresso.syntax.SemanticModel;
+import espresso.syntax.EspressoParser.*;
+import espresso.syntax.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Deque;
@@ -40,7 +34,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     }
 
     @Override
-    public void enterCompilationUnit(CompilationUnitContext node) {
+    public void enterCompilationUnit(EspressoParser.CompilationUnitContext node) {
         Scope compilationUnit = new CompilationUnitSymbol("", node);
         pushScope(node, compilationUnit);
     }

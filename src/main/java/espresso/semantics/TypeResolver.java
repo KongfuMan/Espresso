@@ -2,21 +2,8 @@ package espresso.semantics;
 
 import espresso.semantics.symbols.*;
 import espresso.syntax.EspressoBaseListener;
-import espresso.syntax.EspressoParser.MethodDeclarationContext;
-import espresso.syntax.EspressoParser.VariableDeclaratorContext;
-import espresso.syntax.EspressoParser.FieldDeclarationContext;
-import espresso.syntax.EspressoParser.VariableDeclaratorsContext;
-import espresso.syntax.EspressoParser.VariableDeclaratorIdContext;
-import espresso.syntax.EspressoParser.ParameterContext;
-import espresso.syntax.EspressoParser.ClassDeclarationContext;
-import espresso.syntax.EspressoParser.TypeTypeOrVoidContext;
-import espresso.syntax.EspressoParser.TypeTypeContext;
-import espresso.syntax.EspressoParser.ClassOrInterfaceTypeContext;
-import espresso.syntax.EspressoParser.PrimitiveTypeContext;
-import espresso.syntax.EspressoParser.ParameterListContext;
+import espresso.syntax.EspressoParser.*;
 import espresso.syntax.SemanticModel;
-
-import java.util.List;
 
 // pass2. variable declaration
 public class TypeResolver extends EspressoBaseListener {

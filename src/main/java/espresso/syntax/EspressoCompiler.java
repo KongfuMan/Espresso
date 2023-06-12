@@ -1,6 +1,7 @@
 package espresso.syntax;
 
 import espresso.semantics.TypeDeclarationScanner;
+import espresso.semantics.TypeResolver;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -25,7 +26,9 @@ public class EspressoCompiler {
         TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semantModel);
         walker.walk(pass1, semantModel.getSyntaxTree());
 
-        //semantic analysis- pass2：variable declaration
+        // semantic analysis- pass2：variable declaration
+        TypeResolver pass2 = new TypeResolver(semantModel);
+        walker.walk(pass2, semantModel.getSyntaxTree());
 
         //semantic analysis- pass3: binding referencing identifier to symbol.
 
