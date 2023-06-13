@@ -22,7 +22,7 @@ public class TypeResolver extends EspressoBaseListener {
         //       local variables declaration in the block will be left for the next phase
         String idName = node.IDENTIFIER().getText();
         Scope scope = semanticModel.getContainingScope(node);
-        if (node.getParent().getParent() instanceof FieldDeclarationContext || node.getParent() instanceof ParameterContext){
+        if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext || node.getParent() instanceof ParameterContext){
             VariableSymbol variableSymbol = new VariableSymbol(idName, node, scope);
 
             if (scope.lookup(variableSymbol)){

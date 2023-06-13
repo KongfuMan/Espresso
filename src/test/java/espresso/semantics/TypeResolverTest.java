@@ -17,18 +17,8 @@ class TypeResolverTest {
     private EspressoParser parser;
     private SemanticModel semanticModel;
 
-    public void setup(String fileName) throws IOException {
-        File file = Paths.get("src","test","resources", fileName).toFile();
-        StringBuilder buffer = new StringBuilder();
-        try (FileReader reader = new FileReader(file);
-             BufferedReader br = new BufferedReader(reader)) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                buffer.append(line).append('\n');
-            }
-        }
-
-        lexer = new EspressoLexer(CharStreams.fromString(buffer.toString()));
+    private void setup(String code){
+        lexer = new EspressoLexer(CharStreams.fromString(code));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         //syntax analysis
@@ -47,8 +37,20 @@ class TypeResolverTest {
 
     @Test
     public void testOK() throws IOException {
-        String fileName = "MyClass.esp";
-        setup(fileName);
+        String code = """
+                class MyClass
+                {
+                    int a=2;
+                    int b;
+                                
+                    void func()
+                    {
+                        b = 3;
+                    }
+                }
+                """;
+        setup(code);
+
     }
 
 }
