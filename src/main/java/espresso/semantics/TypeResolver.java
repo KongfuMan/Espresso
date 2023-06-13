@@ -28,7 +28,7 @@ public class TypeResolver extends EspressoBaseListener {
             if (scope.lookup(variableSymbol)){
                 semanticModel.addDiagnose("duplicate variable declaration");
             }
-
+            scope.addSymbol(idName, variableSymbol);
             semanticModel.addNodeToSymbol(node, variableSymbol);
         }
     }

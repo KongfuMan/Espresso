@@ -55,7 +55,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         }
 
         BlockSymbol blockSymbol = new BlockSymbol(node, currentScope());
-        currentScope().addSymbol("", blockSymbol);
+        currentScope().addSymbol(blockSymbol.getName(), blockSymbol);
         pushScope(node, blockSymbol);
     }
 
@@ -68,11 +68,12 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         popScope();
     }
 
+    // create scope for only FOR  statement.
     @Override
     public void enterStatement(StatementContext node) {
         if (node.FOR() != null){
             BlockSymbol blockSymbol = new BlockSymbol(node, currentScope());
-            currentScope().addSymbol("", blockSymbol);
+            currentScope().addSymbol(blockSymbol.getName(), blockSymbol);
             pushScope(node, blockSymbol);
         }
     }

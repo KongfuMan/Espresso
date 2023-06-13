@@ -7,25 +7,27 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Scope extends Symbol{
-    Map<String, Symbol> symbols;
+
+    // direct child symbol in this scope, NOT including descendants of nested scope.
+    public Map<String, Symbol> childScopes;
     protected Scope(String idName, ParserRuleContext node, Scope containingScope){
         super(idName, node, containingScope);
-        symbols = new HashMap<>();
+        childScopes = new HashMap<>();
     }
 
     public void addSymbol(String name, Symbol symbol){
-        symbols.put(name, symbol);
+        childScopes.put(name, symbol);
     }
 
     public boolean lookup(Symbol symbol){
-        return symbols.containsKey(symbol.getName());
+        return childScopes.containsKey(symbol.getName());
     }
 
     public MethodSymbol getMethodDeclaration(String name, List<Type> paramTypes){
-        if (!symbols.containsKey(name)){
+        if (!childScopes.containsKey(name)){
             return null;
         }
-        Symbol symbol = symbols.get(name);
+        Symbol symbol = childScopes.get(name);
         if (!(symbol instanceof MethodSymbol)){
             return null;
         }
