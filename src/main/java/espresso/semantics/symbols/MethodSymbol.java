@@ -15,10 +15,15 @@ public class MethodSymbol extends Scope{
     public MethodSymbol(String idName, ParserRuleContext node, Scope containingScope) {
         super(idName, node, containingScope);
         this.parameterList = new LinkedList<>();
+        this.parameterTypes = new LinkedList<>();
     }
 
     public void setReturnType(Type returnType){
         this.returnType = returnType;
+    }
+
+    public Type getReturnType(){
+        return this.returnType;
     }
 
     public void addParameter(VariableSymbol variable){

@@ -109,4 +109,8 @@ public class SemanticModel {
         }
         return null;
     }
+
+    public Map<ParserRuleContext, Symbol> getNode2Symbol(){
+        return node2Symbol;
+    }
 }
