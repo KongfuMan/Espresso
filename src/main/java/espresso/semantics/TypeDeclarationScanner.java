@@ -38,7 +38,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
      *
      * */
     @Override
-    public void enterBlock(EspressoParser.BlockContext node) {
+    public void enterBlock(BlockContext node) {
         if (node.getParent() instanceof MethodBodyContext){
             // skip the method body block, since we've already had a method scope
             return;
@@ -99,7 +99,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         String className = node.IDENTIFIER().getText();
         ClassSymbol classSymbol = new ClassSymbol(className, node, currentScope());
         semanticModel.addType(classSymbol);
-        if (semanticModel.lookup(currentScope(), classSymbol)){
+        if (semanticModel.lookupClassSymbol(currentScope(), className) != null){
             semanticModel.addDiagnose("duplicate class declaration.");
         }
         currentScope().addSymbol(classSymbol);

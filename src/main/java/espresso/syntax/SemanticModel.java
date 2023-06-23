@@ -53,16 +53,6 @@ public class SemanticModel {
         node2Scope.put(node, scope);
     }
 
-    public boolean lookup(Scope scope, Symbol symbol){
-        while(scope != null){
-            if (scope.contains(symbol)){
-                return true;
-            }
-            scope = scope.getContainingScope();
-        }
-        return false;
-    }
-
     public VariableSymbol lookupVariableSymbol(Scope scope, String idName){
         while(scope != null){
             VariableSymbol symbol = scope.getVariableSymbol(idName);
