@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class EspressoCompiler {
-    SemanticModel semantModel;
+    SemanticModel semanticModel;
     EspressoLexer lexer = null;
     EspressoParser parser = null;
 
@@ -18,17 +18,17 @@ public class EspressoCompiler {
 
         //syntax analysis
         parser = new EspressoParser(tokens);
-        semantModel = new SemanticModel(parser.compilationUnit());
+        semanticModel = new SemanticModel(parser.compilationUnit());
 
         ParseTreeWalker walker = new ParseTreeWalker();
 
         // semantic analysis- pass1.type declaration
-        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semantModel);
-        walker.walk(pass1, semantModel.getSyntaxTree());
+        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semanticModel);
+        walker.walk(pass1, semanticModel.getSyntaxTree());
 
         // semantic analysis- pass2：variable declaration
-        TypeResolver pass2 = new TypeResolver(semantModel);
-        walker.walk(pass2, semantModel.getSyntaxTree());
+        TypeResolver pass2 = new TypeResolver(semanticModel);
+        walker.walk(pass2, semanticModel.getSyntaxTree());
 
         //semantic analysis- pass3: binding referencing identifier to symbol.
 
@@ -38,12 +38,12 @@ public class EspressoCompiler {
 
         //semantic analysis- pass6：closure analysis
         dumpAST();
-        return semantModel;
+        return semanticModel;
     }
 
     public void dumpAST(){
-        if (semantModel!=null) {
-            System.out.println(semantModel.getSyntaxTree().toStringTree(parser));
+        if (semanticModel !=null) {
+            System.out.println(semanticModel.getSyntaxTree().toStringTree(parser));
         }
     }
 }
