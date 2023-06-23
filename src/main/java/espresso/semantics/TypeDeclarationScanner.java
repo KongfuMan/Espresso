@@ -18,7 +18,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     }
 
     private void pushScope(ParserRuleContext node, Scope scope){
-        semanticModel.addNodeToScope(node, scope);
+        semanticModel.addNodeToScope(node, scope); // map (scoped) node to scope symbol
         stackScope.push(scope);
     }
 
@@ -99,7 +99,8 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         String className = node.IDENTIFIER().getText();
         ClassSymbol classSymbol = new ClassSymbol(className, node, currentScope());
         semanticModel.addType(classSymbol);
-        if (semanticModel.lookupClassSymbol(currentScope(), className) != null){
+        if (semanticModel.existAscendantClassSymbolOfIdName(currentScope(), className)){
+            // ascendant class symbol with same already exist.
             semanticModel.addDiagnose("duplicate class declaration.");
         }
         currentScope().addSymbol(classSymbol);
