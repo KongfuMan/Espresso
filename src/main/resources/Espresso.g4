@@ -4,7 +4,7 @@ grammar Espresso;
 import CommonLexer;
 
 @header {
-package espresso;
+package espresso.syntax;
 }
 
 compilationUnit // root node includes one or more class declaration
