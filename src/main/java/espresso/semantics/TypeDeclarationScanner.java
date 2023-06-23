@@ -1,8 +1,8 @@
 package espresso.semantics;
 
 import espresso.semantics.symbols.*;
-import espresso.syntax.EspressoParser.*;
 import espresso.syntax.*;
+import espresso.syntax.EspressoParser.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Deque;
@@ -33,29 +33,19 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         return  null;
     }
 
-    @Override
-    public void enterCompilationUnit(EspressoParser.CompilationUnitContext node) {
-        Scope compilationUnit = new CompilationUnitSymbol("", node);
-        pushScope(node, compilationUnit);
-    }
-
-    @Override
-    public void exitCompilationUnit(CompilationUnitContext ctx) {
-        popScope();
-    }
-
     /**
-     * Since a type can be declared in a block, e.g. nested class declaration inside a
+     * Since a type can be declared in a block, e.g. nested class declaration inside a method block.
      *
      * */
     @Override
-    public void enterBlock(BlockContext node) {
+    public void enterBlock(EspressoParser.BlockContext node) {
         if (node.getParent() instanceof MethodBodyContext){
+            // skip the method body block, since we've already had a method scope
             return;
         }
 
         BlockSymbol blockSymbol = new BlockSymbol(node, currentScope());
-        currentScope().addSymbol(blockSymbol.getName(), blockSymbol);
+        currentScope().addSymbol(blockSymbol);
         pushScope(node, blockSymbol);
     }
 
@@ -73,7 +63,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     public void enterStatement(StatementContext node) {
         if (node.FOR() != null){
             BlockSymbol blockSymbol = new BlockSymbol(node, currentScope());
-            currentScope().addSymbol(blockSymbol.getName(), blockSymbol);
+            currentScope().addSymbol(blockSymbol);
             pushScope(node, blockSymbol);
         }
     }
@@ -83,6 +73,20 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         if (node.FOR() != null){
             popScope();
         }
+    }
+
+    /**
+     * Scan the single namespace declaration in this compilation unit.
+     * */
+    @Override
+    public void enterCompilationUnit(CompilationUnitContext node) {
+        Scope ns = new CompilationUnitSymbol("", node);
+        pushScope(node, ns);
+    }
+
+    @Override
+    public void exitCompilationUnit(CompilationUnitContext node) {
+        popScope();
     }
 
     /**
@@ -98,7 +102,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         if (semanticModel.lookup(currentScope(), classSymbol)){
             semanticModel.addDiagnose("duplicate class declaration.");
         }
-        currentScope().addSymbol(className, classSymbol);
+        currentScope().addSymbol(classSymbol);
         pushScope(node, classSymbol);
     }
 
@@ -106,7 +110,7 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     public void enterMethodDeclaration(MethodDeclarationContext node) {
         String idName = node.IDENTIFIER().getText();
         MethodSymbol methodSymbol = new MethodSymbol(idName, node, currentScope());
-        currentScope().addSymbol(idName, methodSymbol);
+        currentScope().addSymbol(methodSymbol);
         pushScope(node, methodSymbol);
     }
 

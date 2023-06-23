@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,20 +18,6 @@ class TypeDeclarationScannerTest {
     private EspressoLexer lexer;
     private EspressoParser parser;
     private SemanticModel semanticModel;
-
-//    private void setup(String fileName) throws IOException {
-//        File file = Paths.get("src","test","resources", fileName).toFile();
-//        StringBuilder buffer = new StringBuilder();
-//        try (FileReader reader = new FileReader(file);
-//             BufferedReader br = new BufferedReader(reader)) {
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                buffer.append(line).append('\n');
-//            }
-//        }
-//
-//        setupWithCode(buffer.toString());
-//    }
 
     private void setup(String code){
         lexer = new EspressoLexer(CharStreams.fromString(code));
@@ -90,20 +77,42 @@ class TypeDeclarationScannerTest {
                 """;
 
         setup(code);
-        Type type = semanticModel.getType("MyClass");
+        Type type = semanticModel.lookupType("MyClass");
         assertTrue(type instanceof ClassSymbol);
         ClassSymbol classSymbol = (ClassSymbol) type;
         assertTrue(classSymbol.getContainingScope() instanceof CompilationUnitSymbol);
-        Map<String, Symbol> childScopes = classSymbol.childScopes;
-        assertEquals(childScopes.size(),1);
-        Symbol funSymbol = childScopes.get("func");
-        assertTrue(funSymbol instanceof MethodSymbol);
-        assertEquals(((MethodSymbol) funSymbol).childScopes.size(), 0);
-        assertEquals(((MethodSymbol) funSymbol).getContainingScope(), classSymbol);
+
+        List<Symbol> childSymbols = classSymbol.childSymbols;
+        assertEquals(childSymbols.size(),1);
+        Symbol methodSymbol = childSymbols.get(0);
+        assertTrue(methodSymbol instanceof MethodSymbol);
+        assertEquals(((MethodSymbol) methodSymbol).childSymbols.size(), 0);
+        assertEquals(((MethodSymbol) methodSymbol).getContainingScope(), classSymbol);
     }
 
     @Test
-    public void tesStatementOK() throws IOException {
+    public void testMethodMethodOK(){
+        String code = """
+                class MyClass
+                {
+                    int func()
+                    {
+                        return 1;
+                    }
+                }
+                """;
+        setup(code);
+        Type type = semanticModel.lookupType("MyClass");
+        ClassSymbol classSymbol = (ClassSymbol) type; // class scope
+
+        List<Symbol> childSymbols = classSymbol.childSymbols;
+        assertEquals(childSymbols.size(), 1);
+        Symbol funSymbol = childSymbols.get(0); // method scope
+        assertEquals(((MethodSymbol) funSymbol).childSymbols.size(), 0);
+    }
+
+    @Test
+    public void tesStatementOK() {
         String code = """
                 class MyClass
                 {
@@ -126,27 +135,28 @@ class TypeDeclarationScannerTest {
                 """;
 
         setup(code);
-        Type type = semanticModel.getType("MyClass");
+        Type type = semanticModel.lookupType("MyClass");
         assertTrue(type instanceof ClassSymbol);
         ClassSymbol classSymbol = (ClassSymbol) type; // class scope
-        Map<String, Symbol> childScopes = classSymbol.childScopes;
 
-        Symbol funSymbol = childScopes.get("func"); // method scope
-        assertEquals(((MethodSymbol) funSymbol).childScopes.size(), 2);
+        List<Symbol> childSymbols = classSymbol.childSymbols;
 
-        Symbol forStatement = ((MethodSymbol) funSymbol).childScopes.get("block_1"); // for statement scope
+        Symbol funSymbol = childSymbols.get(0); // method scope
+        assertEquals(((MethodSymbol) funSymbol).childSymbols.size(), 2);
+
+        Symbol forStatement = ((MethodSymbol) funSymbol).childSymbols.get(0); // for statement scope
         assertTrue(forStatement instanceof BlockSymbol);
-        assertEquals(((BlockSymbol)forStatement).childScopes.size(), 1);
+        assertEquals(((BlockSymbol)forStatement).childSymbols.size(), 1);
         assertEquals(((BlockSymbol) forStatement).getContainingScope(), funSymbol);
 
-        Symbol forBlock = ((BlockSymbol) forStatement).childScopes.get("block_2"); // block scope of for statement
+        Symbol forBlock = ((BlockSymbol) forStatement).childSymbols.get(0); // block scope of for statement
         assertTrue(forBlock instanceof BlockSymbol);
-        assertEquals(((BlockSymbol) forBlock).childScopes.size(), 0);
+        assertEquals(((BlockSymbol) forBlock).childSymbols.size(), 0);
         assertEquals(((BlockSymbol) forBlock).getContainingScope(), forStatement);
 
-        Symbol ifBlock = ((MethodSymbol) funSymbol).childScopes.get("block_3"); // for statement scope
+        Symbol ifBlock = ((MethodSymbol) funSymbol).childSymbols.get(1); // if statement scope
         assertTrue(ifBlock instanceof BlockSymbol);
-        assertEquals(((BlockSymbol) ifBlock).childScopes.size(), 0);
+        assertEquals(((BlockSymbol) ifBlock).childSymbols.size(), 0);
         assertEquals(((BlockSymbol) ifBlock).getContainingScope(), funSymbol);
     }
 }

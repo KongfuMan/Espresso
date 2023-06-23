@@ -25,10 +25,10 @@ public class TypeResolver extends EspressoBaseListener {
         if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext || node.getParent() instanceof ParameterContext){
             VariableSymbol variableSymbol = new VariableSymbol(idName, node, scope);
 
-            if (scope.lookup(variableSymbol)){
+            if (scope.contains(variableSymbol)){
                 semanticModel.addDiagnose("duplicate variable declaration");
             }
-            scope.addSymbol(idName, variableSymbol);
+            scope.addSymbol(variableSymbol);
             semanticModel.addNodeToSymbol(node, variableSymbol);
         }
     }
@@ -93,7 +93,7 @@ public class TypeResolver extends EspressoBaseListener {
 
         // get class (scoped) symbol associated with the node
         ClassSymbol currClass = (ClassSymbol)(semanticModel.getAssociatedScope(node));
-        Type baseType = semanticModel.getType(node.typeType().getText());
+        Type baseType = semanticModel.lookupType(node.typeType().getText());
         if (baseType == null){
             semanticModel.addDiagnose("Unknown base type");
         }
@@ -130,7 +130,7 @@ public class TypeResolver extends EspressoBaseListener {
     public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext node) {
         if (node.qualifiedName().IDENTIFIER() != null){
             Scope containingScope = semanticModel.getContainingScope(node);
-            ClassSymbol classType = semanticModel.lookupClassUpwards(containingScope, node.getText());
+            ClassSymbol classType = semanticModel.lookupClassSymbol(containingScope, node.getText());
             if (classType == null){
                 semanticModel.addDiagnose("unknown type");
             }

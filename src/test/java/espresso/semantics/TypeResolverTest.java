@@ -4,21 +4,10 @@ import espresso.semantics.symbols.*;
 import espresso.syntax.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -197,7 +186,7 @@ class TypeResolverTest {
             @Override
             public Object visitClassDeclaration(EspressoParser.ClassDeclarationContext node) {
                 String idName = node.IDENTIFIER().getText();
-                Type type = semanticModel.getType(idName);
+                Type type = semanticModel.lookupType(idName);
                 assertTrue(type instanceof ClassSymbol);
                 return super.visitClassDeclaration(node);
             }

@@ -2,7 +2,6 @@ package espresso.semantics.symbols;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,9 +35,8 @@ public class MethodSymbol extends Scope{
     }
 
     /**
-     * 检查改函数是否匹配所需的参数。
-     * @param paramTypes
-     * @return
+     * Check if current method symbol matches the given paramTypes.
+     * @param paramTypes a list of parameter types
      */
     public boolean matchParameterTypes(List<Type> paramTypes){
         // 比较每个参数

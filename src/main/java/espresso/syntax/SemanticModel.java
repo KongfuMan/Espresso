@@ -1,16 +1,13 @@
 package espresso.syntax;
 
-import espresso.semantics.symbols.ClassSymbol;
-import espresso.semantics.symbols.Scope;
-import espresso.semantics.symbols.Symbol;
-import espresso.semantics.symbols.Type;
+import espresso.semantics.symbols.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
 
 public class SemanticModel {
-    private ParseTree syntaxTree;
+    private final ParseTree syntaxTree;
     Set<Type> typeSet;
     List<String> diagnostics;
 
@@ -58,7 +55,7 @@ public class SemanticModel {
 
     public boolean lookup(Scope scope, Symbol symbol){
         while(scope != null){
-            if (scope.lookup(symbol)){
+            if (scope.contains(symbol)){
                 return true;
             }
             scope = scope.getContainingScope();
@@ -66,7 +63,18 @@ public class SemanticModel {
         return false;
     }
 
-    public ClassSymbol lookupClassUpwards(Scope scope, String idName){
+    public VariableSymbol lookupVariableSymbol(Scope scope, String idName){
+        while(scope != null){
+            VariableSymbol symbol = scope.getVariableSymbol(idName);
+            if (symbol != null){
+                return symbol;
+            }
+            scope = scope.getContainingScope();
+        }
+        return null;
+    }
+
+    public ClassSymbol lookupClassSymbol(Scope scope, String idName){
         while(scope != null){
             if (scope instanceof ClassSymbol &&  scope.getName().equals(idName)){
                 return (ClassSymbol) scope;
@@ -101,7 +109,7 @@ public class SemanticModel {
         return node2Scope.get(node);
     }
 
-    public Type getType(String typeName){
+    public Type lookupType(String typeName){
         for (Type type : typeSet){
             if (type.getName().equals(typeName)){
                 return type;
