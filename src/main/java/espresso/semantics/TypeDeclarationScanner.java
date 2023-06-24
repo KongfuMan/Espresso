@@ -99,6 +99,8 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
         String className = node.IDENTIFIER().getText();
         ClassSymbol classSymbol = new ClassSymbol(className, node, currentScope());
         semanticModel.addType(classSymbol);
+
+        // check duplicate class declaration
         if (semanticModel.existAscendantClassSymbolOfIdName(currentScope(), className)){
             // ascendant class symbol with same already exist.
             semanticModel.addDiagnose("duplicate class declaration.");
@@ -111,6 +113,9 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     public void enterMethodDeclaration(MethodDeclarationContext node) {
         String idName = node.IDENTIFIER().getText();
         MethodSymbol methodSymbol = new MethodSymbol(idName, node, currentScope());
+
+        // defer checking the duplicate method declaration since the type of parameters are unknown yet.
+
         currentScope().addSymbol(methodSymbol);
         pushScope(node, methodSymbol);
     }
