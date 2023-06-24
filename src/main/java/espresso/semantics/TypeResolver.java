@@ -14,7 +14,7 @@ public class TypeResolver extends EspressoBaseListener {
     }
 
     /**
-     * Create symbol for variable declaration in class field and method parameters.
+     * Create symbol for identifier of variableDeclarator of class field and method parameters.
      * */
     @Override
     public void enterVariableDeclaratorId(VariableDeclaratorIdContext node) {
@@ -22,12 +22,20 @@ public class TypeResolver extends EspressoBaseListener {
         //       local variables declaration in the block will be left for the next phase
         String idName = node.IDENTIFIER().getText();
         Scope scope = semanticModel.getContainingScope(node);
-        if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext || node.getParent() instanceof ParameterContext){
+        if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext ||
+            node.getParent() instanceof ParameterContext) {
             VariableSymbol variableSymbol = new VariableSymbol(idName, node, scope);
 
-            if (scope.contains(variableSymbol)){
+            // should not have multiple identifier of same name in same scope, regardless of type
+            // e.g.
+            // class myClass {
+            //     int age;
+            //     String age; #illegal
+            // }
+            if (scope.lookupVariableSymbol(idName) != null){
                 semanticModel.addDiagnose("duplicate variable declaration");
             }
+
             scope.addSymbol(variableSymbol);
             semanticModel.addNodeToSymbol(node, variableSymbol);
         }
@@ -42,6 +50,7 @@ public class TypeResolver extends EspressoBaseListener {
             return;
         }
 
+        // typeType has been resolved by exitTypeType(...) listener
         Type type = semanticModel.getNodeType(node.typeType());
         for (VariableDeclaratorContext variableNode : node.variableDeclarator()){
             VariableSymbol varSymbol = (VariableSymbol)semanticModel.getSymbol(variableNode.variableDeclaratorId());
@@ -50,7 +59,7 @@ public class TypeResolver extends EspressoBaseListener {
     }
 
     /**
-     * Resolve type of single parameter of method.
+     * Resolve type of each parameter of method.
      * */
     @Override
     public void exitParameter(ParameterContext node) {
