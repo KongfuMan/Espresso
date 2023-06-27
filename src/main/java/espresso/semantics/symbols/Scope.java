@@ -19,18 +19,6 @@ public abstract class Scope extends Symbol{
         childSymbols.add(symbol);
     }
 
-    /**
-     * Check if symbol has already existed in the scope.
-     * */
-    public boolean contains(Symbol targetSymbol){
-        for(Symbol symbol : childSymbols){
-            if (symbol == targetSymbol){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public MethodSymbol getMethodDeclaration(String name, List<Type> paramTypes){
         MethodSymbol result = null;
         for (Symbol symbol : childSymbols){
@@ -39,14 +27,19 @@ public abstract class Scope extends Symbol{
             }
             MethodSymbol methodSymbol = (MethodSymbol) symbol;
             if (methodSymbol.matchParameterTypes(paramTypes)){
+                // if method name and type of each parameter match, then return the matched method symbol.
                 result = methodSymbol;
+                break;
             }
         }
 
         return result;
     }
 
-    public VariableSymbol getVariableSymbol(String idName){
+    /**
+     * Look up the variable symbol with the give simple identifier name in current scope
+     * */
+    public VariableSymbol lookupVariableSymbol(String idName){
         for (Symbol symbol : childSymbols){
             if (symbol instanceof VariableSymbol && symbol.getName().equals(idName)){
                 return (VariableSymbol) symbol;

@@ -9,8 +9,15 @@ import espresso.syntax.SemanticModel;
 public class TypeResolver extends EspressoBaseListener {
     private SemanticModel semanticModel;
 
+    private final boolean enterLocalVariable;
+
     public TypeResolver(SemanticModel semanticModel){
+        this(semanticModel, false);
+    }
+
+    public TypeResolver(SemanticModel semanticModel, boolean enterLocalVariable){
         this.semanticModel = semanticModel;
+        this.enterLocalVariable = enterLocalVariable;
     }
 
     /**
@@ -23,14 +30,15 @@ public class TypeResolver extends EspressoBaseListener {
         String idName = node.IDENTIFIER().getText();
         Scope scope = semanticModel.getContainingScope(node);
         if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext ||
-            node.getParent() instanceof ParameterContext) {
+            node.getParent() instanceof ParameterContext || enterLocalVariable) {
             VariableSymbol variableSymbol = new VariableSymbol(idName, node, scope);
 
             // should not have multiple identifier of same name in same scope, regardless of type
             // e.g.
             // class myClass {
             //     int age;
-            //     String age; #illegal
+            //     String age; # duplicate age
+            //     void fun(int a, double a){} # duplicate a
             // }
             if (scope.lookupVariableSymbol(idName) != null){
                 semanticModel.addDiagnose("duplicate variable declaration");
@@ -46,12 +54,12 @@ public class TypeResolver extends EspressoBaseListener {
      * */
     @Override
     public void exitVariableDeclarators(VariableDeclaratorsContext node) {
-        if (!(node.getParent() instanceof FieldDeclarationContext)){
+        if (!(node.getParent() instanceof FieldDeclarationContext || enterLocalVariable)){
             return;
         }
 
         // typeType has been resolved by exitTypeType(...) listener
-        Type type = semanticModel.getNodeType(node.typeType());
+        Type type = semanticModel.getType(node.typeType());
         for (VariableDeclaratorContext variableNode : node.variableDeclarator()){
             VariableSymbol varSymbol = (VariableSymbol)semanticModel.getSymbol(variableNode.variableDeclaratorId());
             varSymbol.setType(type);
@@ -63,7 +71,7 @@ public class TypeResolver extends EspressoBaseListener {
      * */
     @Override
     public void exitParameter(ParameterContext node) {
-        Type paramType = semanticModel.getNodeType(node.typeType());
+        Type paramType = semanticModel.getType(node.typeType());
         VariableSymbol variableSymbol = (VariableSymbol)semanticModel.getSymbol(node.variableDeclaratorId());
         variableSymbol.setType(paramType);
 
@@ -79,7 +87,7 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void exitMethodDeclaration(MethodDeclarationContext node) {
         MethodSymbol methodSymbol = (MethodSymbol)semanticModel.getAssociatedScope(node);
-        Type returnType = semanticModel.getNodeType(node.typeTypeOrVoid());
+        Type returnType = semanticModel.getType(node.typeTypeOrVoid());
         methodSymbol.setReturnType(returnType);
 
         // Check duplicate method, since the method has been completely resolved at this point.
@@ -117,7 +125,7 @@ public class TypeResolver extends EspressoBaseListener {
         if (node.VOID() != null){
             semanticModel.addNodeToType(node, VoidType.instance());
         } else if (node.typeType() != null){
-            semanticModel.addNodeToType(node, semanticModel.getNodeType(node.typeType()));
+            semanticModel.addNodeToType(node, semanticModel.getType(node.typeType()));
         }
     }
 
@@ -125,9 +133,9 @@ public class TypeResolver extends EspressoBaseListener {
     public void exitTypeType(TypeTypeContext node) {
         Type type = null;
         if (node.classOrInterfaceType() !=  null){
-            type = semanticModel.getNodeType(node.classOrInterfaceType());
+            type = semanticModel.getType(node.classOrInterfaceType());
         }else if (node.primitiveType() != null){
-            type = semanticModel.getNodeType(node.primitiveType());
+            type = semanticModel.getType(node.primitiveType());
         }
         semanticModel.addNodeToType(node, type);
     }

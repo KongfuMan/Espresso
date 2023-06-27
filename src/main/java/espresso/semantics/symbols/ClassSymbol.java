@@ -3,7 +3,7 @@ package espresso.semantics.symbols;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class ClassSymbol extends Scope implements Type{
-    private Type baseType;
+    private ClassSymbol baseType;
 
     public ClassSymbol(String idName, ParserRuleContext node, Scope containingScope){
         super(idName, node, containingScope);
@@ -13,7 +13,7 @@ public class ClassSymbol extends Scope implements Type{
         if (!(baseType instanceof ClassSymbol)){
             throw new IllegalArgumentException("Base type is not a class");
         }
-        this.baseType = baseType;
+        this.baseType = (ClassSymbol)baseType;
     }
 
     public Type getBaseType(){

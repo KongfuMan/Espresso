@@ -1,5 +1,6 @@
 package espresso.syntax;
 
+import espresso.semantics.ReferenceResolver;
 import espresso.semantics.TypeDeclarationScanner;
 import espresso.semantics.TypeResolver;
 import org.antlr.v4.runtime.CharStreams;
@@ -31,6 +32,8 @@ public class EspressoCompiler {
         walker.walk(pass2, semanticModel.getSyntaxTree());
 
         //semantic analysis- pass3: binding referencing identifier to symbol.
+        ReferenceResolver pass3 = new ReferenceResolver(semanticModel);
+        walker.walk(pass3, semanticModel.getSyntaxTree());
 
         //semantic analysis- pass4：type checking
 

@@ -7,9 +7,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.*;
 
 public class SemanticModel {
-    private final ParseTree syntaxTree;
+    final ParseTree syntaxTree;
     Set<Type> typeSet;
-    List<String> diagnostics;
+    public List<String> diagnostics;
 
     // <declaration syntax node : Type>
     Map<ParserRuleContext, Type> node2Type;
@@ -41,7 +41,11 @@ public class SemanticModel {
         node2Type.put(node, type);
     }
 
-    public Type getNodeType(ParserRuleContext node){
+    public void addNodeToScope(ParserRuleContext node, Scope scope){
+        node2Scope.put(node, scope);
+    }
+
+    public Type getType(ParserRuleContext node){
         return node2Type.get(node);
     }
 
@@ -49,35 +53,11 @@ public class SemanticModel {
         diagnostics.add(msg);
     }
 
-    public void addNodeToScope(ParserRuleContext node, Scope scope){
-        node2Scope.put(node, scope);
-    }
-
-    public VariableSymbol lookupVariableSymbol(Scope scope, String idName){
-        while(scope != null){
-            VariableSymbol symbol = scope.getVariableSymbol(idName);
-            if (symbol != null){
-                return symbol;
-            }
-            scope = scope.getContainingScope();
-        }
-        return null;
-    }
-
-    public ClassSymbol lookupClassSymbol(Scope scope, String idName){
-        while(scope != null){
-            if (scope instanceof ClassSymbol &&  scope.getName().equals(idName)){
-                return (ClassSymbol) scope;
-            }
-            scope = scope.getContainingScope();
-        }
-        return null;
-    }
-
     /**
      * Search for containing scope of this node up to root scope.
      * */
     public Scope getContainingScope(ParserRuleContext node) {
+        node = node.getParent();
         while(node != null){
             if(node2Scope.containsKey(node)){
                 return node2Scope.get(node);
@@ -99,6 +79,9 @@ public class SemanticModel {
         return node2Scope.get(node);
     }
 
+    /**
+     * Get the type definition by the idName.
+     * */
     public Type lookupType(String typeName){
         for (Type type : typeSet){
             if (type.getName().equals(typeName)){
@@ -108,7 +91,43 @@ public class SemanticModel {
         return null;
     }
 
-    public Map<ParserRuleContext, Symbol> getNode2Symbol(){
-        return node2Symbol;
+    /**
+     * Search from current scope to root scope for the variable by idName
+     * */
+    public VariableSymbol lookupVariableSymbol(Scope scope, String idName){
+        while(scope != null){
+            VariableSymbol symbol = scope.lookupVariableSymbol(idName);
+            if (symbol != null){
+                return symbol;
+            }
+            scope = scope.getContainingScope();
+        }
+        return null;
+    }
+
+    /**
+     * Search for lowest ascendant class symbol of the scope by idName.
+     * */
+    public ClassSymbol lookupClassSymbol(Scope scope, String idName){
+        while(scope != null){
+            if (scope instanceof ClassSymbol &&  scope.getName().equals(idName)){
+                return (ClassSymbol) scope;
+            }
+            scope = scope.getContainingScope();
+        }
+        return null;
+    }
+
+    /**
+     * Look up ascendant ClassSymbol to see if there is one with the given name
+     * */
+    public boolean existAscendantClassSymbolOfIdName(Scope scope, String idName){
+        while(scope != null){
+            if (scope instanceof ClassSymbol &&  scope.getName().equals(idName)){
+                return true;
+            }
+            scope = scope.getContainingScope();
+        }
+        return false;
     }
 }
