@@ -181,8 +181,8 @@ expressionList
 
 methodCall
     : IDENTIFIER '(' expressionList? ')'
-    | THIS '(' expressionList? ')'
-    | SUPER '(' expressionList? ')'
+//    | THIS '(' expressionList? ')'
+//    | SUPER '(' expressionList? ')'
     ;
 
 expression
@@ -190,7 +190,6 @@ expression
     | expression bop='.'
       ( IDENTIFIER
       | methodCall
-      | THIS
       )
     | expression '[' expression ']'
     | methodCall
