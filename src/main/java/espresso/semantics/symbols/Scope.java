@@ -48,6 +48,15 @@ public abstract class Scope extends Symbol{
         return null;
     }
 
+    public ClassSymbol lookupClassSymbol(String idName){
+        for (Symbol symbol : childSymbols){
+            if (symbol instanceof ClassSymbol && symbol.getName().equals(idName)){
+                return (ClassSymbol) symbol;
+            }
+        }
+        return null;
+    }
+
     public ClassSymbol getClassSymbol(String idName){
         for (Symbol symbol : childSymbols){
             if (symbol instanceof ClassSymbol && symbol.getName().equals(idName)){

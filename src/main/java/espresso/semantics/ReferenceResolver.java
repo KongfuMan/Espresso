@@ -26,6 +26,16 @@ public class ReferenceResolver extends EspressoBaseListener {
         }
     }
 
+    /**
+     *  int myVar = 0;
+     *  expression: myVar = myExpression2
+     *       primary:
+     *           IDENTIFIER:
+     *                 myVar
+     *       bop: '='
+     *       expression: myExpression2
+     *  myVar = myExpression2;
+     * */
     @Override
     public void exitPrimary(PrimaryContext node) {
         if (node.IDENTIFIER() == null){
@@ -43,7 +53,7 @@ public class ReferenceResolver extends EspressoBaseListener {
             semanticModel.addDiagnose("unknown variable or function: " + idName);
         }
 
-        // set primary type as the declared type
+        // set declared type for primary node, e.g. <myVar, int>
         semanticModel.addNodeToType(node, type);
     }
 
