@@ -82,7 +82,12 @@ public class TypeResolver extends EspressoBaseListener {
     }
 
     /**
-     * Resolve the return type of method
+     * Resolve the return type of method.
+     * methodDeclaration
+     *     : typeTypeOrVoid IDENTIFIER parameterList ('[' ']')*
+     *       (THROWS qualifiedNameList)?
+     *       methodBody
+     *     ;
      * */
     @Override
     public void exitMethodDeclaration(MethodDeclarationContext node) {
@@ -100,7 +105,9 @@ public class TypeResolver extends EspressoBaseListener {
     }
 
     /**
-     * Resolve the type of base class
+     * Resolve the type of base class.
+     * classDeclaration
+     *     : CLASS IDENTIFIER (EXTENDS typeType)? classBody
      * */
     @Override
     public void enterClassDeclaration(ClassDeclarationContext node) {
@@ -125,6 +132,7 @@ public class TypeResolver extends EspressoBaseListener {
         if (node.VOID() != null){
             semanticModel.addNodeToType(node, VoidType.instance());
         } else if (node.typeType() != null){
+            // bubble up the bound node
             semanticModel.addNodeToType(node, semanticModel.getType(node.typeType()));
         }
     }
@@ -137,11 +145,13 @@ public class TypeResolver extends EspressoBaseListener {
         }else if (node.primitiveType() != null){
             type = semanticModel.getType(node.primitiveType());
         }
+
+        // bubble up the bound node
         semanticModel.addNodeToType(node, type);
     }
 
     /**
-     * Find the class definition type for Class or interface type of variable declaration.
+     * Bind class or interface type of variable declaration with type declaration.
      * */
     @Override
     public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext node) {
@@ -156,7 +166,7 @@ public class TypeResolver extends EspressoBaseListener {
     }
 
     /**
-     * For variable declaration with primitive type, add node to type
+     * For primitive type of variable declaration, add <node, type>
      * */
     @Override
     public void exitPrimitiveType(PrimitiveTypeContext node) {

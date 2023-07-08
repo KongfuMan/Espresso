@@ -75,6 +75,9 @@ public class SemanticModel {
         return node2Symbol.get(node);
     }
 
+    /**
+     * Get the scope by the representing node(class, method, block)
+     * */
     public Scope getAssociatedScope(ParserRuleContext node){
         return node2Scope.get(node);
     }
