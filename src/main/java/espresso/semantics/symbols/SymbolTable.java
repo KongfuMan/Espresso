@@ -20,6 +20,11 @@ public class SymbolTable {
     public static PrimitiveType String = new PrimitiveType("String"); //增加String为基础类型
     public static PrimitiveType Null = new PrimitiveType("Null");
 
+    // This is the top-level module singleton.
+//    public final ModuleSymbol unamedModule;
+
+//    public final PackageSymbol rootPackage;
+
     final ParseTree syntaxTree;
     Set<Type> typeSet;
     public List<String> diagnostics;

@@ -1,4 +1,4 @@
-package espresso.semantics;
+package espresso.vm;
 
 import espresso.semantics.symbols.SymbolTable;
 import espresso.syntax.EspressoBaseVisitor;
