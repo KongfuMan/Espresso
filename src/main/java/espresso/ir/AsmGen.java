@@ -2,7 +2,7 @@ package espresso.ir;
 
 import espresso.syntax.EspressoBaseVisitor;
 import espresso.syntax.EspressoParser;
-import espresso.semantics.SymbolTable;
+import espresso.semantics.symbols.SymbolTable;
 
 public class AsmGen extends EspressoBaseVisitor<Oprand> {
     private SymbolTable symbolTable;

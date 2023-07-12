@@ -1,5 +1,6 @@
 package espresso.semantics;
 
+import espresso.semantics.symbols.SymbolTable;
 import espresso.syntax.EspressoLexer;
 import espresso.syntax.EspressoParser;
 import org.antlr.v4.runtime.CharStreams;

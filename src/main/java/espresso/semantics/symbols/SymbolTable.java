@@ -1,4 +1,4 @@
-package espresso.semantics;
+package espresso.semantics.symbols;
 
 import espresso.semantics.symbols.*;
 import org.antlr.v4.runtime.ParserRuleContext;

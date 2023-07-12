@@ -1,7 +1,7 @@
 package espresso.syntax;
 
 import espresso.semantics.ReferenceResolver;
-import espresso.semantics.SymbolTable;
+import espresso.semantics.symbols.SymbolTable;
 import espresso.semantics.TypeDeclarationScanner;
 import espresso.semantics.TypeResolver;
 import org.antlr.v4.runtime.CharStreams;

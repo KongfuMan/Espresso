@@ -1,5 +1,6 @@
 package espresso.semantics;
 
+import espresso.semantics.symbols.SymbolTable;
 import espresso.syntax.EspressoBaseVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;

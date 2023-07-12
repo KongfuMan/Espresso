@@ -1,5 +1,6 @@
 package espresso.semantics;
 
+import espresso.semantics.symbols.SymbolTable;
 import espresso.syntax.EspressoBaseVisitor;
 import espresso.syntax.EspressoParser;
 import espresso.vm.Opcodes;
