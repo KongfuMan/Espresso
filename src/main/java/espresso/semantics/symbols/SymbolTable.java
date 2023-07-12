@@ -1,12 +1,25 @@
 package espresso.semantics.symbols;
 
-import espresso.semantics.symbols.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
 
 public class SymbolTable {
+
+    /** primitive symbols as singleton shared globally*/
+    public static PrimitiveType Integer = new PrimitiveType("Integer");
+    public static PrimitiveType Long = new PrimitiveType("Long");
+    public static PrimitiveType Float = new PrimitiveType("Double");
+    public static PrimitiveType Double = new PrimitiveType("Double");
+    public static PrimitiveType Boolean = new PrimitiveType("Boolean");
+    public static PrimitiveType Byte = new PrimitiveType("Byte");
+    public static PrimitiveType Char = new PrimitiveType("Char");
+    public static PrimitiveType Short = new PrimitiveType("Short");
+
+    public static PrimitiveType String = new PrimitiveType("String"); //增加String为基础类型
+    public static PrimitiveType Null = new PrimitiveType("Null");
+
     final ParseTree syntaxTree;
     Set<Type> typeSet;
     public List<String> diagnostics;
@@ -83,7 +96,7 @@ public class SymbolTable {
     }
 
     /**
-     * Get the type definition by the idName.
+     * Get the named type by the idName.
      * */
     public Type lookupType(String typeName){
         for (Type type : typeSet){
@@ -95,7 +108,8 @@ public class SymbolTable {
     }
 
     /**
-     * Search from current scope to root scope for the variable by idName
+     * Search for the variable by idName in current scope. If not found, keep searching
+     * the upper level containing scope until reaching the top-level scope.
      * */
     public VariableSymbol lookupVariableSymbol(Scope scope, String idName){
         while(scope != null){
@@ -113,8 +127,9 @@ public class SymbolTable {
      * */
     public ClassSymbol lookupClassSymbol(Scope scope, String idName){
         while(scope != null){
-            if (scope instanceof ClassSymbol &&  scope.getName().equals(idName)){
-                return (ClassSymbol) scope;
+            ClassSymbol classSymbol = scope.lookupClassSymbol(idName);
+            if (classSymbol != null){
+                return classSymbol;
             }
             scope = scope.getContainingScope();
         }

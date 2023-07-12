@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class Scope extends Symbol{
 
-    // direct child symbols in this scope, NOT including descendants of nested scope.
+    // child symbols direct contained in this scope, NOT include those contained in the nested scope.
     public List<Symbol> childSymbols;
 
     protected Scope(String idName, ParserRuleContext node, Scope containingScope){

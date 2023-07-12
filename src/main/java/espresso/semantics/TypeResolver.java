@@ -6,16 +6,16 @@ import espresso.syntax.EspressoParser.*;
 
 // pass2. variable declaration
 public class TypeResolver extends EspressoBaseListener {
-    private SymbolTable symbolTable;
+    private SymbolTable symTab;
 
     private final boolean enterLocalVariable;
 
-    public TypeResolver(SymbolTable symbolTable){
-        this(symbolTable, false);
+    public TypeResolver(SymbolTable symTab){
+        this(symTab, false);
     }
 
-    public TypeResolver(SymbolTable symbolTable, boolean enterLocalVariable){
-        this.symbolTable = symbolTable;
+    public TypeResolver(SymbolTable symTab, boolean enterLocalVariable){
+        this.symTab = symTab;
         this.enterLocalVariable = enterLocalVariable;
     }
 
@@ -27,7 +27,7 @@ public class TypeResolver extends EspressoBaseListener {
         // TODO: resolving class field declaration , method parameters.
         //       local variables declaration in the block will be left for the next phase
         String idName = node.IDENTIFIER().getText();
-        Scope scope = symbolTable.getContainingScope(node);
+        Scope scope = symTab.getContainingScope(node);
         if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext ||
             node.getParent() instanceof ParameterContext || enterLocalVariable) {
             VariableSymbol variableSymbol = new VariableSymbol(idName, node, scope);
@@ -40,11 +40,11 @@ public class TypeResolver extends EspressoBaseListener {
             //     void fun(int a, double a){} # duplicate a
             // }
             if (scope.lookupVariableSymbol(idName) != null){
-                symbolTable.addDiagnose("duplicate variable declaration");
+                symTab.addDiagnose("duplicate variable declaration");
             }
 
             scope.addSymbol(variableSymbol);
-            symbolTable.addNodeToSymbol(node, variableSymbol);
+            symTab.addNodeToSymbol(node, variableSymbol);
         }
     }
 
@@ -58,9 +58,9 @@ public class TypeResolver extends EspressoBaseListener {
         }
 
         // typeType has been resolved by exitTypeType(...) listener
-        Type type = symbolTable.getType(node.typeType());
+        Type type = symTab.getType(node.typeType());
         for (VariableDeclaratorContext variableNode : node.variableDeclarator()){
-            VariableSymbol varSymbol = (VariableSymbol) symbolTable.getSymbol(variableNode.variableDeclaratorId());
+            VariableSymbol varSymbol = (VariableSymbol) symTab.getSymbol(variableNode.variableDeclaratorId());
             varSymbol.setType(type);
         }
     }
@@ -70,11 +70,11 @@ public class TypeResolver extends EspressoBaseListener {
      * */
     @Override
     public void exitParameter(ParameterContext node) {
-        Type paramType = symbolTable.getType(node.typeType());
-        VariableSymbol variableSymbol = (VariableSymbol) symbolTable.getSymbol(node.variableDeclaratorId());
+        Type paramType = symTab.getType(node.typeType());
+        VariableSymbol variableSymbol = (VariableSymbol) symTab.getSymbol(node.variableDeclaratorId());
         variableSymbol.setType(paramType);
 
-        Scope scope = symbolTable.getContainingScope(node);
+        Scope scope = symTab.getContainingScope(node);
         if (scope instanceof MethodSymbol){
             ((MethodSymbol)scope).addParameter(variableSymbol);
         }
@@ -90,16 +90,16 @@ public class TypeResolver extends EspressoBaseListener {
      * */
     @Override
     public void exitMethodDeclaration(MethodDeclarationContext node) {
-        MethodSymbol methodSymbol = (MethodSymbol) symbolTable.getAssociatedScope(node);
-        Type returnType = symbolTable.getType(node.typeTypeOrVoid());
+        MethodSymbol methodSymbol = (MethodSymbol) symTab.getAssociatedScope(node);
+        Type returnType = symTab.getType(node.typeTypeOrVoid());
         methodSymbol.setReturnType(returnType);
 
         // Check duplicate method, since the method has been completely resolved at this point.
         String idName = node.IDENTIFIER().getText();
-        Scope scope = symbolTable.getContainingScope(node);
+        Scope scope = symTab.getContainingScope(node);
         MethodSymbol findResult = scope.lookupMethodSymbol(idName, methodSymbol.getParameterTypes());
         if (findResult != null && findResult != methodSymbol){
-            symbolTable.addDiagnose("duplicate method declaration");
+            symTab.addDiagnose("duplicate method declaration");
         }
     }
 
@@ -115,10 +115,10 @@ public class TypeResolver extends EspressoBaseListener {
         }
 
         // get class (scoped) symbol associated with the node
-        ClassSymbol currClass = (ClassSymbol)(symbolTable.getAssociatedScope(node));
-        Type baseType = symbolTable.lookupType(node.typeType().getText());
+        ClassSymbol currClass = (ClassSymbol)(symTab.getAssociatedScope(node));
+        Type baseType = symTab.lookupType(node.typeType().getText());
         if (baseType == null){
-            symbolTable.addDiagnose("Unknown base type");
+            symTab.addDiagnose("Unknown base type");
         }
         currClass.setBaseType(baseType);
     }
@@ -129,10 +129,10 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void exitTypeTypeOrVoid(TypeTypeOrVoidContext node) {
         if (node.VOID() != null){
-            symbolTable.addNodeToType(node, VoidType.instance());
+            symTab.addNodeToType(node, VoidType.instance());
         } else if (node.typeType() != null){
             // bubble up the bound node
-            symbolTable.addNodeToType(node, symbolTable.getType(node.typeType()));
+            symTab.addNodeToType(node, symTab.getType(node.typeType()));
         }
     }
 
@@ -140,13 +140,13 @@ public class TypeResolver extends EspressoBaseListener {
     public void exitTypeType(TypeTypeContext node) {
         Type type = null;
         if (node.classOrInterfaceType() !=  null){
-            type = symbolTable.getType(node.classOrInterfaceType());
+            type = symTab.getType(node.classOrInterfaceType());
         }else if (node.primitiveType() != null){
-            type = symbolTable.getType(node.primitiveType());
+            type = symTab.getType(node.primitiveType());
         }
 
         // bubble up the bound node
-        symbolTable.addNodeToType(node, type);
+        symTab.addNodeToType(node, type);
     }
 
     /**
@@ -155,12 +155,12 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext node) {
         if (node.qualifiedName().IDENTIFIER() != null){
-            Scope containingScope = symbolTable.getContainingScope(node);
-            ClassSymbol classType = symbolTable.lookupClassSymbol(containingScope, node.getText());
+            Scope containingScope = symTab.getContainingScope(node);
+            ClassSymbol classType = symTab.lookupClassSymbol(containingScope, node.getText());
             if (classType == null){
-                symbolTable.addDiagnose("unknown type");
+                symTab.addDiagnose("unknown type");
             }
-            symbolTable.addNodeToType(node, classType);
+            symTab.addNodeToType(node, classType);
         }
     }
 
@@ -170,27 +170,27 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void exitPrimitiveType(PrimitiveTypeContext node) {
         Type type = null;
-        Scope containingScope = symbolTable.getContainingScope(node);
+        Scope containingScope = symTab.getContainingScope(node);
         if (node.BOOLEAN() != null) {
-            type = PrimitiveSymbol.Boolean(node, containingScope);
+            type = SymbolTable.Boolean;
         } else if (node.INT() != null) {
-            type = PrimitiveSymbol.Integer(node, containingScope);
+            type = SymbolTable.Integer;
         } else if (node.LONG() != null) {
-            type = PrimitiveSymbol.Long(node, containingScope);
+            type = SymbolTable.Long;
         } else if (node.FLOAT() != null) {
-            type = PrimitiveSymbol.Float(node, containingScope);
+            type = SymbolTable.Float;
         } else if (node.DOUBLE() != null) {
-            type = PrimitiveSymbol.Double(node, containingScope);
+            type = SymbolTable.Double;
         } else if (node.BYTE() != null) {
-            type = PrimitiveSymbol.Byte(node, containingScope);
+            type = SymbolTable.Byte;
         } else if (node.SHORT() != null) {
-            type = PrimitiveSymbol.Short(node, containingScope);
+            type = SymbolTable.Short;
         } else if (node.CHAR() != null) {
-            type = PrimitiveSymbol.Char(node, containingScope);
+            type = SymbolTable.Char;
         }else if (node.STRING() != null) {
-            type = PrimitiveSymbol.String(node, containingScope);
+            type = SymbolTable.String;
         }
 
-        symbolTable.addNodeToType(node, type);
+        symTab.addNodeToType(node, type);
     }
 }

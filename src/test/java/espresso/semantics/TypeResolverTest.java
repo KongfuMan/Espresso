@@ -53,7 +53,7 @@ class TypeResolverTest {
                 if (node.IDENTIFIER().getText().equals("a")){
                     Symbol varSymbol = symbolTable.getSymbol(node); // int
                     assertTrue(varSymbol instanceof VariableSymbol);
-                    assertTrue(((VariableSymbol) varSymbol).getType() instanceof PrimitiveSymbol);
+                    assertTrue(((VariableSymbol) varSymbol).getType() instanceof PrimitiveType);
                 }
                 return super.visitVariableDeclaratorId(node);
             }
@@ -61,7 +61,7 @@ class TypeResolverTest {
             @Override
             public Object visitPrimitiveType(EspressoParser.PrimitiveTypeContext node) {
                 Type nodeType = symbolTable.getType(node);
-                assertTrue(nodeType instanceof PrimitiveSymbol);
+                assertTrue(nodeType instanceof PrimitiveType);
                 assertEquals(nodeType.getName(), "Integer");
                 Scope containingScope = symbolTable.getContainingScope(node);
                 assertTrue(containingScope instanceof ClassSymbol);
@@ -106,7 +106,7 @@ class TypeResolverTest {
             public Object visitParameter(EspressoParser.ParameterContext node) {
                 Type paramType = symbolTable.getType(node.typeType());
                 VariableSymbol variableSymbol = (VariableSymbol) symbolTable.getSymbol(node.variableDeclaratorId());
-                assertTrue(variableSymbol.getType() instanceof PrimitiveSymbol);
+                assertTrue(variableSymbol.getType() instanceof PrimitiveType);
                 return super.visitParameter(node);
             }
 
@@ -115,7 +115,7 @@ class TypeResolverTest {
                 if (node.IDENTIFIER().getText().equals("myParam")){
                     Symbol varSymbol = symbolTable.getSymbol(node); // int
                     assertTrue(varSymbol instanceof VariableSymbol);
-                    assertTrue(((VariableSymbol) varSymbol).getType() instanceof PrimitiveSymbol);
+                    assertTrue(((VariableSymbol) varSymbol).getType() instanceof PrimitiveType);
                 }
                 return super.visitVariableDeclaratorId(node);
             }
@@ -123,7 +123,7 @@ class TypeResolverTest {
             @Override
             public Object visitPrimitiveType(EspressoParser.PrimitiveTypeContext node) {
                 Type nodeType = symbolTable.getType(node);
-                assertTrue(nodeType instanceof PrimitiveSymbol);
+                assertTrue(nodeType instanceof PrimitiveType);
                 assertEquals(nodeType.getName(), "Integer");
                 Scope containingScope = symbolTable.getContainingScope(node);
                 assertTrue(containingScope instanceof MethodSymbol);
