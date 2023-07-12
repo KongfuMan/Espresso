@@ -98,7 +98,7 @@ public class TypeResolver extends EspressoBaseListener {
         // Check duplicate method, since the method has been completely resolved at this point.
         String idName = node.IDENTIFIER().getText();
         Scope scope = semanticModel.getContainingScope(node);
-        MethodSymbol findResult = scope.getMethodDeclaration(idName, methodSymbol.getParameterTypes());
+        MethodSymbol findResult = scope.lookupMethodSymbol(idName, methodSymbol.getParameterTypes());
         if (findResult != null && findResult != methodSymbol){
             semanticModel.addDiagnose("duplicate method declaration");
         }
