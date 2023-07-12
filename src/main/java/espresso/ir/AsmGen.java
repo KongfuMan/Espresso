@@ -2,15 +2,15 @@ package espresso.ir;
 
 import espresso.syntax.EspressoBaseVisitor;
 import espresso.syntax.EspressoParser;
-import espresso.syntax.SemanticModel;
+import espresso.semantics.SymbolTable;
 
 public class AsmGen extends EspressoBaseVisitor<Oprand> {
-    private SemanticModel semanticModel;
+    private SymbolTable symbolTable;
 
     private AsmModule asmModule;
 
-    public AsmGen(SemanticModel semanticModel){
-        this.semanticModel = semanticModel;
+    public AsmGen(SymbolTable symbolTable){
+        this.symbolTable = symbolTable;
     }
 
     @Override

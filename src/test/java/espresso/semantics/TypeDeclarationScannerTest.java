@@ -2,7 +2,6 @@ package espresso.semantics;
 
 import espresso.syntax.*;
 import espresso.semantics.symbols.*;
-import espresso.syntax.SemanticModel;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TypeDeclarationScannerTest {
     private EspressoLexer lexer;
     private EspressoParser parser;
-    private SemanticModel semanticModel;
+    private SymbolTable symbolTable;
 
     private void setup(String code){
         lexer = new EspressoLexer(CharStreams.fromString(code));
@@ -24,13 +23,13 @@ class TypeDeclarationScannerTest {
 
         //syntax analysis
         parser = new EspressoParser(tokens);
-        semanticModel = new SemanticModel(parser.compilationUnit());
+        symbolTable = new SymbolTable(parser.compilationUnit());
 
         ParseTreeWalker walker = new ParseTreeWalker();
 
         // semantic analysis- pass1.type declaration
-        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semanticModel);
-        walker.walk(pass1, semanticModel.getSyntaxTree());
+        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(symbolTable);
+        walker.walk(pass1, symbolTable.getSyntaxTree());
     }
 
     @Test
@@ -48,7 +47,7 @@ class TypeDeclarationScannerTest {
                 }
                 """;
         setup(code);
-        String stringTree = semanticModel.getSyntaxTree().toStringTree(parser);
+        String stringTree = symbolTable.getSyntaxTree().toStringTree(parser);
         String expected = "(compilationUnit (classDeclaration class MyClass (classBody { (classBodyDeclaration " +
                 "(memberDeclaration (fieldDeclaration (variableDeclarators (typeType (primitiveType int))" +
                 " (variableDeclarator (variableDeclaratorId a) = (variableInitializer (expression (primary " +
@@ -76,7 +75,7 @@ class TypeDeclarationScannerTest {
                 """;
 
         setup(code);
-        Type type = semanticModel.lookupType("MyClass");
+        Type type = symbolTable.lookupType("MyClass");
         assertTrue(type instanceof ClassSymbol);
         ClassSymbol classSymbol = (ClassSymbol) type;
         assertTrue(classSymbol.getContainingScope() instanceof CompilationUnitSymbol);
@@ -101,7 +100,7 @@ class TypeDeclarationScannerTest {
                 }
                 """;
         setup(code);
-        Type type = semanticModel.lookupType("MyClass");
+        Type type = symbolTable.lookupType("MyClass");
         ClassSymbol classSymbol = (ClassSymbol) type; // class scope
 
         List<Symbol> childSymbols = classSymbol.childSymbols;
@@ -134,7 +133,7 @@ class TypeDeclarationScannerTest {
                 """;
 
         setup(code);
-        Type type = semanticModel.lookupType("MyClass");
+        Type type = symbolTable.lookupType("MyClass");
         assertTrue(type instanceof ClassSymbol);
         ClassSymbol classSymbol = (ClassSymbol) type; // class scope
 

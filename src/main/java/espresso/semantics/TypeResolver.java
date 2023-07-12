@@ -3,20 +3,19 @@ package espresso.semantics;
 import espresso.semantics.symbols.*;
 import espresso.syntax.EspressoBaseListener;
 import espresso.syntax.EspressoParser.*;
-import espresso.syntax.SemanticModel;
 
 // pass2. variable declaration
 public class TypeResolver extends EspressoBaseListener {
-    private SemanticModel semanticModel;
+    private SymbolTable symbolTable;
 
     private final boolean enterLocalVariable;
 
-    public TypeResolver(SemanticModel semanticModel){
-        this(semanticModel, false);
+    public TypeResolver(SymbolTable symbolTable){
+        this(symbolTable, false);
     }
 
-    public TypeResolver(SemanticModel semanticModel, boolean enterLocalVariable){
-        this.semanticModel = semanticModel;
+    public TypeResolver(SymbolTable symbolTable, boolean enterLocalVariable){
+        this.symbolTable = symbolTable;
         this.enterLocalVariable = enterLocalVariable;
     }
 
@@ -28,7 +27,7 @@ public class TypeResolver extends EspressoBaseListener {
         // TODO: resolving class field declaration , method parameters.
         //       local variables declaration in the block will be left for the next phase
         String idName = node.IDENTIFIER().getText();
-        Scope scope = semanticModel.getContainingScope(node);
+        Scope scope = symbolTable.getContainingScope(node);
         if (node.getParent().getParent().getParent() instanceof FieldDeclarationContext ||
             node.getParent() instanceof ParameterContext || enterLocalVariable) {
             VariableSymbol variableSymbol = new VariableSymbol(idName, node, scope);
@@ -41,11 +40,11 @@ public class TypeResolver extends EspressoBaseListener {
             //     void fun(int a, double a){} # duplicate a
             // }
             if (scope.lookupVariableSymbol(idName) != null){
-                semanticModel.addDiagnose("duplicate variable declaration");
+                symbolTable.addDiagnose("duplicate variable declaration");
             }
 
             scope.addSymbol(variableSymbol);
-            semanticModel.addNodeToSymbol(node, variableSymbol);
+            symbolTable.addNodeToSymbol(node, variableSymbol);
         }
     }
 
@@ -59,9 +58,9 @@ public class TypeResolver extends EspressoBaseListener {
         }
 
         // typeType has been resolved by exitTypeType(...) listener
-        Type type = semanticModel.getType(node.typeType());
+        Type type = symbolTable.getType(node.typeType());
         for (VariableDeclaratorContext variableNode : node.variableDeclarator()){
-            VariableSymbol varSymbol = (VariableSymbol)semanticModel.getSymbol(variableNode.variableDeclaratorId());
+            VariableSymbol varSymbol = (VariableSymbol) symbolTable.getSymbol(variableNode.variableDeclaratorId());
             varSymbol.setType(type);
         }
     }
@@ -71,11 +70,11 @@ public class TypeResolver extends EspressoBaseListener {
      * */
     @Override
     public void exitParameter(ParameterContext node) {
-        Type paramType = semanticModel.getType(node.typeType());
-        VariableSymbol variableSymbol = (VariableSymbol)semanticModel.getSymbol(node.variableDeclaratorId());
+        Type paramType = symbolTable.getType(node.typeType());
+        VariableSymbol variableSymbol = (VariableSymbol) symbolTable.getSymbol(node.variableDeclaratorId());
         variableSymbol.setType(paramType);
 
-        Scope scope = semanticModel.getContainingScope(node);
+        Scope scope = symbolTable.getContainingScope(node);
         if (scope instanceof MethodSymbol){
             ((MethodSymbol)scope).addParameter(variableSymbol);
         }
@@ -91,16 +90,16 @@ public class TypeResolver extends EspressoBaseListener {
      * */
     @Override
     public void exitMethodDeclaration(MethodDeclarationContext node) {
-        MethodSymbol methodSymbol = (MethodSymbol)semanticModel.getAssociatedScope(node);
-        Type returnType = semanticModel.getType(node.typeTypeOrVoid());
+        MethodSymbol methodSymbol = (MethodSymbol) symbolTable.getAssociatedScope(node);
+        Type returnType = symbolTable.getType(node.typeTypeOrVoid());
         methodSymbol.setReturnType(returnType);
 
         // Check duplicate method, since the method has been completely resolved at this point.
         String idName = node.IDENTIFIER().getText();
-        Scope scope = semanticModel.getContainingScope(node);
+        Scope scope = symbolTable.getContainingScope(node);
         MethodSymbol findResult = scope.lookupMethodSymbol(idName, methodSymbol.getParameterTypes());
         if (findResult != null && findResult != methodSymbol){
-            semanticModel.addDiagnose("duplicate method declaration");
+            symbolTable.addDiagnose("duplicate method declaration");
         }
     }
 
@@ -116,10 +115,10 @@ public class TypeResolver extends EspressoBaseListener {
         }
 
         // get class (scoped) symbol associated with the node
-        ClassSymbol currClass = (ClassSymbol)(semanticModel.getAssociatedScope(node));
-        Type baseType = semanticModel.lookupType(node.typeType().getText());
+        ClassSymbol currClass = (ClassSymbol)(symbolTable.getAssociatedScope(node));
+        Type baseType = symbolTable.lookupType(node.typeType().getText());
         if (baseType == null){
-            semanticModel.addDiagnose("Unknown base type");
+            symbolTable.addDiagnose("Unknown base type");
         }
         currClass.setBaseType(baseType);
     }
@@ -130,10 +129,10 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void exitTypeTypeOrVoid(TypeTypeOrVoidContext node) {
         if (node.VOID() != null){
-            semanticModel.addNodeToType(node, VoidType.instance());
+            symbolTable.addNodeToType(node, VoidType.instance());
         } else if (node.typeType() != null){
             // bubble up the bound node
-            semanticModel.addNodeToType(node, semanticModel.getType(node.typeType()));
+            symbolTable.addNodeToType(node, symbolTable.getType(node.typeType()));
         }
     }
 
@@ -141,13 +140,13 @@ public class TypeResolver extends EspressoBaseListener {
     public void exitTypeType(TypeTypeContext node) {
         Type type = null;
         if (node.classOrInterfaceType() !=  null){
-            type = semanticModel.getType(node.classOrInterfaceType());
+            type = symbolTable.getType(node.classOrInterfaceType());
         }else if (node.primitiveType() != null){
-            type = semanticModel.getType(node.primitiveType());
+            type = symbolTable.getType(node.primitiveType());
         }
 
         // bubble up the bound node
-        semanticModel.addNodeToType(node, type);
+        symbolTable.addNodeToType(node, type);
     }
 
     /**
@@ -156,12 +155,12 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext node) {
         if (node.qualifiedName().IDENTIFIER() != null){
-            Scope containingScope = semanticModel.getContainingScope(node);
-            ClassSymbol classType = semanticModel.lookupClassSymbol(containingScope, node.getText());
+            Scope containingScope = symbolTable.getContainingScope(node);
+            ClassSymbol classType = symbolTable.lookupClassSymbol(containingScope, node.getText());
             if (classType == null){
-                semanticModel.addDiagnose("unknown type");
+                symbolTable.addDiagnose("unknown type");
             }
-            semanticModel.addNodeToType(node, classType);
+            symbolTable.addNodeToType(node, classType);
         }
     }
 
@@ -171,7 +170,7 @@ public class TypeResolver extends EspressoBaseListener {
     @Override
     public void exitPrimitiveType(PrimitiveTypeContext node) {
         Type type = null;
-        Scope containingScope = semanticModel.getContainingScope(node);
+        Scope containingScope = symbolTable.getContainingScope(node);
         if (node.BOOLEAN() != null) {
             type = PrimitiveSymbol.Boolean(node, containingScope);
         } else if (node.INT() != null) {
@@ -192,6 +191,6 @@ public class TypeResolver extends EspressoBaseListener {
             type = PrimitiveSymbol.String(node, containingScope);
         }
 
-        semanticModel.addNodeToType(node, type);
+        symbolTable.addNodeToType(node, type);
     }
 }

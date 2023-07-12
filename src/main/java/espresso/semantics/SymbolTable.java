@@ -1,4 +1,4 @@
-package espresso.syntax;
+package espresso.semantics;
 
 import espresso.semantics.symbols.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
 
-public class SemanticModel {
+public class SymbolTable {
     final ParseTree syntaxTree;
     Set<Type> typeSet;
     public List<String> diagnostics;
@@ -20,7 +20,7 @@ public class SemanticModel {
     // <referencing syntax node, declaration symbol>
     Map<ParserRuleContext, Symbol> node2Symbol;
 
-    public SemanticModel(ParseTree syntaxTree){
+    public SymbolTable(ParseTree syntaxTree){
         this.typeSet = new HashSet<>();
         this.diagnostics = new ArrayList<>();
         this.node2Type = new HashMap<>();

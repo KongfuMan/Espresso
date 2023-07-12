@@ -10,15 +10,15 @@ import java.util.LinkedList;
 
 // pass1. Scan custom type declaration and check duplicate declaration in hierarchical scopes.
 public class TypeDeclarationScanner extends EspressoBaseListener {
-    SemanticModel semanticModel;
+    SymbolTable symbolTable;
     Deque<Scope> stackScope;
-    public TypeDeclarationScanner(SemanticModel semanticModel){
-        this.semanticModel = semanticModel;
+    public TypeDeclarationScanner(SymbolTable symbolTable){
+        this.symbolTable = symbolTable;
         this.stackScope = new LinkedList<>();
     }
 
     private void pushScope(ParserRuleContext node, Scope scope){
-        semanticModel.addNodeToScope(node, scope); // map (scoped) node to scope symbol
+        symbolTable.addNodeToScope(node, scope); // map (scoped) node to scope symbol
         stackScope.push(scope);
     }
 
@@ -98,12 +98,12 @@ public class TypeDeclarationScanner extends EspressoBaseListener {
     public void enterClassDeclaration(ClassDeclarationContext node){
         String className = node.IDENTIFIER().getText();
         ClassSymbol classSymbol = new ClassSymbol(className, node, currentScope());
-        semanticModel.addType(classSymbol);
+        symbolTable.addType(classSymbol);
 
         // check duplicate class declaration
-        if (semanticModel.existAscendantClassSymbolOfIdName(currentScope(), className)){
+        if (symbolTable.existAscendantClassSymbolOfIdName(currentScope(), className)){
             // ascendant class symbol with same already exist.
-            semanticModel.addDiagnose("duplicate class declaration.");
+            symbolTable.addDiagnose("duplicate class declaration.");
         }
         currentScope().addSymbol(classSymbol);
         pushScope(node, classSymbol);

@@ -4,25 +4,24 @@ import espresso.semantics.symbols.*;
 import espresso.syntax.EspressoBaseListener;
 import espresso.syntax.EspressoParser.*;
 import espresso.syntax.EspressoParser;
-import espresso.syntax.SemanticModel;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 // pass3.
 public class ReferenceResolver extends EspressoBaseListener {
-    private final SemanticModel semanticModel;
+    private final SymbolTable symbolTable;
 
-    public ReferenceResolver(SemanticModel semanticModel){
-        this.semanticModel = semanticModel;
+    public ReferenceResolver(SymbolTable symbolTable){
+        this.symbolTable = symbolTable;
     }
 
     @Override
     public void enterVariableDeclarators(VariableDeclaratorsContext node) {
-        Scope scope = semanticModel.getContainingScope(node);
+        Scope scope = symbolTable.getContainingScope(node);
         if (scope instanceof BlockSymbol || scope instanceof MethodSymbol){
-            TypeResolver pass2 = new TypeResolver(semanticModel, true);
+            TypeResolver pass2 = new TypeResolver(symbolTable, true);
             ParseTreeWalker walker = new ParseTreeWalker();
-            walker.walk(pass2, semanticModel.getSyntaxTree());
+            walker.walk(pass2, symbolTable.getSyntaxTree());
         }
     }
 
@@ -43,18 +42,18 @@ public class ReferenceResolver extends EspressoBaseListener {
         }
         // search for Symbol by idName of primary node in the containing scope or its ancestor scopes
         Type type = null;
-        Scope scope = semanticModel.getContainingScope(node);
+        Scope scope = symbolTable.getContainingScope(node);
         String idName = node.IDENTIFIER().getText();
-        VariableSymbol variableSymbol = semanticModel.lookupVariableSymbol(scope, idName);
+        VariableSymbol variableSymbol = symbolTable.lookupVariableSymbol(scope, idName);
         if (variableSymbol != null){
-            semanticModel.addNodeToSymbol(node, variableSymbol);
+            symbolTable.addNodeToSymbol(node, variableSymbol);
             type = variableSymbol.getType();
         }else{
-            semanticModel.addDiagnose("unknown variable or function: " + idName);
+            symbolTable.addDiagnose("unknown variable or function: " + idName);
         }
 
         // set declared type for primary node, e.g. <myVar, int>
-        semanticModel.addNodeToType(node, type);
+        symbolTable.addNodeToType(node, type);
     }
 
     @Override
@@ -73,20 +72,20 @@ public class ReferenceResolver extends EspressoBaseListener {
         //            identifier: method
         if (bop != null && bop.getType() == EspressoParser.DOT){
             ExpressionContext primary = node.expression(0);
-            semanticModel.getType(primary);
+            symbolTable.getType(primary);
             // ...
         }
 
         // flatten the <node:type> of "expression (primary ("a"))"
         if (node.primary() != null){
             // variable declaration symbol of primary
-            Symbol symbol = semanticModel.getSymbol(node.primary());
-            semanticModel.addNodeToSymbol(node, symbol);
+            Symbol symbol = symbolTable.getSymbol(node.primary());
+            symbolTable.addNodeToSymbol(node, symbol);
         }
 
         Type type = null;
         if (node.primary() != null){
-            type = semanticModel.getType(node.primary());
+            type = symbolTable.getType(node.primary());
         }
         // assignment expression:
         //      int a = 0;
@@ -94,11 +93,11 @@ public class ReferenceResolver extends EspressoBaseListener {
         if (bop != null && bop.getType() == EspressoParser.ASSIGN){
             ExpressionContext expression = node.expression(0);
             if (expression.primary() != null){
-                type = semanticModel.getType(expression.primary());
+                type = symbolTable.getType(expression.primary());
             }
 
             int i = 0;
         }
-        semanticModel.addNodeToType(node, type);
+        symbolTable.addNodeToType(node, type);
     }
 }

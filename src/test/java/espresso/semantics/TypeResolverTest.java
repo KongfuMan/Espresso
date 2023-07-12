@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TypeResolverTest {
     private EspressoLexer lexer;
     private EspressoParser parser;
-    private SemanticModel semanticModel;
+    private SymbolTable symbolTable;
 
     private void setup(String code){
         lexer = new EspressoLexer(CharStreams.fromString(code));
@@ -22,16 +22,16 @@ class TypeResolverTest {
 
         //syntax analysis
         parser = new EspressoParser(tokens);
-        semanticModel = new SemanticModel(parser.compilationUnit());
+        symbolTable = new SymbolTable(parser.compilationUnit());
 
         ParseTreeWalker walker = new ParseTreeWalker();
 
         // semantic analysis- pass1.type declaration
-        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semanticModel);
-        walker.walk(pass1, semanticModel.getSyntaxTree());
+        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(symbolTable);
+        walker.walk(pass1, symbolTable.getSyntaxTree());
 
-        TypeResolver pass2 = new TypeResolver(semanticModel);
-        walker.walk(pass2, semanticModel.getSyntaxTree());
+        TypeResolver pass2 = new TypeResolver(symbolTable);
+        walker.walk(pass2, symbolTable.getSyntaxTree());
     }
 
     @Test
@@ -51,7 +51,7 @@ class TypeResolverTest {
             @Override
             public Object visitVariableDeclaratorId(EspressoParser.VariableDeclaratorIdContext node) {
                 if (node.IDENTIFIER().getText().equals("a")){
-                    Symbol varSymbol = semanticModel.getSymbol(node); // int
+                    Symbol varSymbol = symbolTable.getSymbol(node); // int
                     assertTrue(varSymbol instanceof VariableSymbol);
                     assertTrue(((VariableSymbol) varSymbol).getType() instanceof PrimitiveSymbol);
                 }
@@ -60,22 +60,22 @@ class TypeResolverTest {
 
             @Override
             public Object visitPrimitiveType(EspressoParser.PrimitiveTypeContext node) {
-                Type nodeType = semanticModel.getType(node);
+                Type nodeType = symbolTable.getType(node);
                 assertTrue(nodeType instanceof PrimitiveSymbol);
                 assertEquals(nodeType.getName(), "Integer");
-                Scope containingScope = semanticModel.getContainingScope(node);
+                Scope containingScope = symbolTable.getContainingScope(node);
                 assertTrue(containingScope instanceof ClassSymbol);
 
-                Type parentNodeType = semanticModel.getType(node.getParent());
+                Type parentNodeType = symbolTable.getType(node.getParent());
                 assertEquals(parentNodeType, nodeType);
-                containingScope = semanticModel.getContainingScope(node.getParent());
+                containingScope = symbolTable.getContainingScope(node.getParent());
                 assertTrue(containingScope instanceof ClassSymbol);
 
                 return super.visitPrimitiveType(node);
             }
         }
         MyVisitor visitor = new MyVisitor();
-        visitor.visit(semanticModel.getSyntaxTree());
+        visitor.visit(symbolTable.getSyntaxTree());
     }
 
     @Test
@@ -92,11 +92,11 @@ class TypeResolverTest {
         class MyVisitor extends EspressoBaseVisitor{
             @Override
             public Object visitMethodDeclaration(EspressoParser.MethodDeclarationContext node) {
-                MethodSymbol methodSymbol = (MethodSymbol)semanticModel.getAssociatedScope(node);
-                Type returnType = semanticModel.getType(node.typeTypeOrVoid());
+                MethodSymbol methodSymbol = (MethodSymbol) symbolTable.getAssociatedScope(node);
+                Type returnType = symbolTable.getType(node.typeTypeOrVoid());
                 assertEquals(methodSymbol.getReturnType(), returnType);
 
-                Scope containingScope = semanticModel.getContainingScope(node);
+                Scope containingScope = symbolTable.getContainingScope(node);
                 assertTrue(containingScope instanceof ClassSymbol);
 
                 return super.visitMethodDeclaration(node);
@@ -104,8 +104,8 @@ class TypeResolverTest {
 
             @Override
             public Object visitParameter(EspressoParser.ParameterContext node) {
-                Type paramType = semanticModel.getType(node.typeType());
-                VariableSymbol variableSymbol = (VariableSymbol)semanticModel.getSymbol(node.variableDeclaratorId());
+                Type paramType = symbolTable.getType(node.typeType());
+                VariableSymbol variableSymbol = (VariableSymbol) symbolTable.getSymbol(node.variableDeclaratorId());
                 assertTrue(variableSymbol.getType() instanceof PrimitiveSymbol);
                 return super.visitParameter(node);
             }
@@ -113,7 +113,7 @@ class TypeResolverTest {
             @Override
             public Object visitVariableDeclaratorId(EspressoParser.VariableDeclaratorIdContext node) {
                 if (node.IDENTIFIER().getText().equals("myParam")){
-                    Symbol varSymbol = semanticModel.getSymbol(node); // int
+                    Symbol varSymbol = symbolTable.getSymbol(node); // int
                     assertTrue(varSymbol instanceof VariableSymbol);
                     assertTrue(((VariableSymbol) varSymbol).getType() instanceof PrimitiveSymbol);
                 }
@@ -122,22 +122,22 @@ class TypeResolverTest {
 
             @Override
             public Object visitPrimitiveType(EspressoParser.PrimitiveTypeContext node) {
-                Type nodeType = semanticModel.getType(node);
+                Type nodeType = symbolTable.getType(node);
                 assertTrue(nodeType instanceof PrimitiveSymbol);
                 assertEquals(nodeType.getName(), "Integer");
-                Scope containingScope = semanticModel.getContainingScope(node);
+                Scope containingScope = symbolTable.getContainingScope(node);
                 assertTrue(containingScope instanceof MethodSymbol);
 
-                Type parentNodeType = semanticModel.getType(node.getParent());
+                Type parentNodeType = symbolTable.getType(node.getParent());
                 assertEquals(parentNodeType, nodeType);
-                containingScope = semanticModel.getContainingScope(node.getParent());
+                containingScope = symbolTable.getContainingScope(node.getParent());
                 assertTrue(containingScope instanceof MethodSymbol);
 
                 return super.visitPrimitiveType(node);
             }
         }
         MyVisitor myVisitor = new MyVisitor();
-        myVisitor.visit(semanticModel.getSyntaxTree());
+        myVisitor.visit(symbolTable.getSyntaxTree());
     }
 
     @Test
@@ -156,7 +156,7 @@ class TypeResolverTest {
             @Override
             public Object visitVariableDeclaratorId(EspressoParser.VariableDeclaratorIdContext node) {
                 if (node.IDENTIFIER().getText().equals("myLocal")){
-                    Symbol varSymbol = semanticModel.getSymbol(node); // int
+                    Symbol varSymbol = symbolTable.getSymbol(node); // int
                     // local variables will be scanned in next pass.
                     assertNull(varSymbol);
                 }
@@ -164,7 +164,7 @@ class TypeResolverTest {
             }
         }
         MyVisitor myVisitor = new MyVisitor();
-        myVisitor.visit(semanticModel.getSyntaxTree());
+        myVisitor.visit(symbolTable.getSyntaxTree());
     }
 
     @Test
@@ -181,14 +181,14 @@ class TypeResolverTest {
             @Override
             public Object visitClassDeclaration(EspressoParser.ClassDeclarationContext node) {
                 String idName = node.IDENTIFIER().getText();
-                Type type = semanticModel.lookupType(idName);
+                Type type = symbolTable.lookupType(idName);
                 assertTrue(type instanceof ClassSymbol);
                 return super.visitClassDeclaration(node);
             }
 
             @Override
             public Object visitVariableDeclaratorId(EspressoParser.VariableDeclaratorIdContext node) {
-                Symbol symbol = semanticModel.getSymbol(node);
+                Symbol symbol = symbolTable.getSymbol(node);
                 assertTrue(symbol instanceof VariableSymbol);
                 assertTrue(((VariableSymbol) symbol).getType() instanceof ClassSymbol);
                 return super.visitVariableDeclaratorId(node);
@@ -196,17 +196,17 @@ class TypeResolverTest {
 
             @Override
             public Object visitClassOrInterfaceType(EspressoParser.ClassOrInterfaceTypeContext node) {
-                Type nodeType = semanticModel.getType(node);
+                Type nodeType = symbolTable.getType(node);
                 assertTrue(nodeType instanceof ClassSymbol);
 
-                Type parentNodeType = semanticModel.getType(node.getParent());
+                Type parentNodeType = symbolTable.getType(node.getParent());
                 assertEquals(nodeType, parentNodeType);
 
                 return super.visitClassOrInterfaceType(node);
             }
         }
         MyVisitor myVisitor = new MyVisitor();
-        myVisitor.visit(semanticModel.getSyntaxTree());
+        myVisitor.visit(symbolTable.getSyntaxTree());
     }
 
     @Test
@@ -219,7 +219,7 @@ class TypeResolverTest {
                 }
                 """;
         setup(code);
-        assertEquals(1, semanticModel.diagnostics.size());
+        assertEquals(1, symbolTable.diagnostics.size());
         code = """
                 class MyType {}
                 class MyClass
@@ -229,7 +229,7 @@ class TypeResolverTest {
                 }
                 """;
         setup(code);
-        assertEquals(1, semanticModel.diagnostics.size());
+        assertEquals(1, symbolTable.diagnostics.size());
     }
 
     @Test
@@ -246,8 +246,8 @@ class TypeResolverTest {
             @Override
             public Object visitClassDeclaration(EspressoParser.ClassDeclarationContext node) {
                 if (node.IDENTIFIER().getText().equals("derivedClass")){
-                    Type definedType = semanticModel.lookupType("baseClass");
-                    Scope derivedClass = semanticModel.getAssociatedScope(node);
+                    Type definedType = symbolTable.lookupType("baseClass");
+                    Scope derivedClass = symbolTable.getAssociatedScope(node);
                     assertTrue(derivedClass instanceof ClassSymbol);
                     Type baseType = ((ClassSymbol) derivedClass).getBaseType();
                     assertEquals(baseType, definedType);
@@ -256,6 +256,6 @@ class TypeResolverTest {
             }
         }
         MyVisitor myVisitor = new MyVisitor();
-        myVisitor.visit(semanticModel.getSyntaxTree());
+        myVisitor.visit(symbolTable.getSyntaxTree());
     }
 }

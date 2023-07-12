@@ -1,6 +1,7 @@
 package espresso.syntax;
 
 import espresso.semantics.ReferenceResolver;
+import espresso.semantics.SymbolTable;
 import espresso.semantics.TypeDeclarationScanner;
 import espresso.semantics.TypeResolver;
 import org.antlr.v4.runtime.CharStreams;
@@ -8,32 +9,32 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class EspressoCompiler {
-    SemanticModel semanticModel;
+    SymbolTable symbolTable;
     EspressoLexer lexer = null;
     EspressoParser parser = null;
 
-    public SemanticModel compile(String script) {
+    public SymbolTable compile(String script) {
         //Lexical analysis
         lexer = new EspressoLexer(CharStreams.fromString(script));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         //syntax analysis
         parser = new EspressoParser(tokens);
-        semanticModel = new SemanticModel(parser.compilationUnit());
+        symbolTable = new SymbolTable(parser.compilationUnit());
 
         ParseTreeWalker walker = new ParseTreeWalker();
 
         // semantic analysis- pass1.type declaration
-        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(semanticModel);
-        walker.walk(pass1, semanticModel.getSyntaxTree());
+        TypeDeclarationScanner pass1 = new TypeDeclarationScanner(symbolTable);
+        walker.walk(pass1, symbolTable.getSyntaxTree());
 
         // semantic analysis- pass2：variable declaration
-        TypeResolver pass2 = new TypeResolver(semanticModel);
-        walker.walk(pass2, semanticModel.getSyntaxTree());
+        TypeResolver pass2 = new TypeResolver(symbolTable);
+        walker.walk(pass2, symbolTable.getSyntaxTree());
 
         //semantic analysis- pass3: binding referencing identifier to symbol.
-        ReferenceResolver pass3 = new ReferenceResolver(semanticModel);
-        walker.walk(pass3, semanticModel.getSyntaxTree());
+        ReferenceResolver pass3 = new ReferenceResolver(symbolTable);
+        walker.walk(pass3, symbolTable.getSyntaxTree());
 
         //semantic analysis- pass4：type checking
 
@@ -41,12 +42,12 @@ public class EspressoCompiler {
 
         //semantic analysis- pass6：closure analysis
         dumpAST();
-        return semanticModel;
+        return symbolTable;
     }
 
     public void dumpAST(){
-        if (semanticModel !=null) {
-            System.out.println(semanticModel.getSyntaxTree().toStringTree(parser));
+        if (symbolTable !=null) {
+            System.out.println(symbolTable.getSyntaxTree().toStringTree(parser));
         }
     }
 }
